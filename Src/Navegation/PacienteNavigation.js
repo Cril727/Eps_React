@@ -5,12 +5,11 @@ import MainStack from './Stack/MainStack';
 import { CitasStack } from './Stack/CitasStack';
 import { EspecialidadesStack } from './Stack/EspecialidadStack';
 import { DoctoresStack } from './Stack/DoctoresStack';
-import { PacientesStack } from './Stack/PacientesStack';
-import { ConsultoriosStack } from './Stack/ConsultoriosStack';
+import { ProfileStack } from './Stack/ProfileStack';
 
 const Tab = createBottomTabNavigator();
 
-export default function MainNavegation() {
+export default function PacienteNavigation() {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -34,62 +33,29 @@ export default function MainNavegation() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" color={color} size={size} /> 
           ),
-          tabBarLabel: 'DashBoard',
+          tabBarLabel: 'Inicio',
         }}
       />
 
       <Tab.Screen
-        name="Especialidades"
-        component={EspecialidadesStack}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="star" size={size} color={color} /> 
-          ),
-          tabBarLabel: 'Especialidades',
-        }}
-      />
-
-      <Tab.Screen
-        name="Doctores"
-        component={DoctoresStack}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} /> 
-          ),
-          tabBarLabel: 'Doctores',
-        }}
-      />
-
-      <Tab.Screen
-        name="Pacientes"
-        component={PacientesStack}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="people" size={size} color={color} /> 
-          ),
-          tabBarLabel: 'Pacientes',
-        }}
-      />
-
-      <Tab.Screen
-        name="Citas"
+        name="MisCitas"
         component={CitasStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-number" size={size} color={color} />
           ),
-          tabBarLabel: 'Citas',
+          tabBarLabel: 'Mis Citas',
         }}
       />
 
       <Tab.Screen
-        name="Consultorios"
-        component={ConsultoriosStack}
+        name="Perfil"
+        component={ProfileStack}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="business" size={size} color={color} />
+            <Ionicons name="person-circle" size={size} color={color} />
           ),
-          tabBarLabel: 'Consultorios',
+          tabBarLabel: 'Mi Perfil',
         }}
       />
     </Tab.Navigator>

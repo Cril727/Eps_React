@@ -1,18 +1,20 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Consultorios from '../../../screens/admins/Consultorios';
+import MiConsultorio from '../../../screens/doctores/MiConsultorio';
 
 const Stack = createNativeStackNavigator();
 
-export function ConsultoriosStack() {
+export function MiConsultorioStack() {
   return (
-      <Stack.Navigator       
+      <Stack.Navigator
         screenOptions={{
         headerStyle: { backgroundColor: '#0c82eaff' },
         headerTintColor: '#fff',
         headerTitleAlign: 'start',
       }}>
-      <Stack.Screen name="AdminConsultorios" component={Consultorios} options={{ title: 'Gestión de Consultorios' }} />
+      <Stack.Screen name="MiConsultorioScreen" component={MiConsultorio} options={{ title: 'Mi Consultorio' }} />
     </Stack.Navigator>
   );
 }
+
+export default MiConsultorioStack;

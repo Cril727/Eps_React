@@ -3,14 +3,17 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import MainStack from './Stack/MainStack';
 import { CitasStack } from './Stack/CitasStack';
+import { AdminCitasStack } from './Stack/AdminCitasStack';
 import { EspecialidadesStack } from './Stack/EspecialidadStack';
 import { DoctoresStack } from './Stack/DoctoresStack';
 import { PacientesStack } from './Stack/PacientesStack';
 import { ConsultoriosStack } from './Stack/ConsultoriosStack';
+import { UsuariosStack } from './Stack/UsuariosStack';
+import { ProfileStack } from './Stack/ProfileStack';
 
 const Tab = createBottomTabNavigator();
 
-export default function MainNavegation() {
+export default function AdminNavigation() {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -34,18 +37,18 @@ export default function MainNavegation() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" color={color} size={size} /> 
           ),
-          tabBarLabel: 'DashBoard',
+          tabBarLabel: 'Dashboard',
         }}
       />
 
       <Tab.Screen
-        name="Especialidades"
-        component={EspecialidadesStack}
+        name="Usuarios"
+        component={UsuariosStack}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="star" size={size} color={color} /> 
+            <Ionicons name="people-circle" size={size} color={color} />
           ),
-          tabBarLabel: 'Especialidades',
+          tabBarLabel: 'Usuarios',
         }}
       />
 
@@ -72,13 +75,13 @@ export default function MainNavegation() {
       />
 
       <Tab.Screen
-        name="Citas"
-        component={CitasStack}
+        name="Especialidades"
+        component={EspecialidadesStack}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar-number" size={size} color={color} />
+            <Ionicons name="star" size={size} color={color} /> 
           ),
-          tabBarLabel: 'Citas',
+          tabBarLabel: 'Especialidades',
         }}
       />
 
@@ -90,6 +93,28 @@ export default function MainNavegation() {
             <Ionicons name="business" size={size} color={color} />
           ),
           tabBarLabel: 'Consultorios',
+        }}
+      />
+
+      <Tab.Screen
+        name="Citas"
+        component={AdminCitasStack}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="calendar" size={size} color={color} />
+          ),
+          tabBarLabel: 'Citas',
+        }}
+      />
+
+      <Tab.Screen
+        name="Perfil"
+        component={ProfileStack}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-circle" size={size} color={color} />
+          ),
+          tabBarLabel: 'Mi Perfil',
         }}
       />
     </Tab.Navigator>

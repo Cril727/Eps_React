@@ -33,8 +33,14 @@ export default function Citas() {
       setUserRole(userInfo?.role);
 
       if (userInfo?.role === 'doctor') {
-        loadMisCitasDoctor();
-        loadCitasPendientesDoctor();
+        try {
+          await loadMisCitasDoctor();
+          await loadCitasPendientesDoctor();
+        } catch (error) {
+          console.error('Error loading doctor appointments:', error);
+        } finally {
+          setLoading(false);
+        }
       } else {
         loadMisCitas();
         loadDoctoresDisponibles();

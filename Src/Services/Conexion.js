@@ -1,7 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const URL_BASE = "http://10.112.71.16:8000/";
+const URL_BASE = "http://10.219.26.16:8000";
 
 const api = axios.create({
   baseURL: URL_BASE,
@@ -11,7 +11,7 @@ const api = axios.create({
   },
 });
 
-const rutasPublicas = ["api/login", "api/addUser"]; // Rutas sin autentificación
+const rutasPublicas = ["api/login"]; // Rutas sin autentificación
 
 // Interceptor de request
 api.interceptors.request.use(

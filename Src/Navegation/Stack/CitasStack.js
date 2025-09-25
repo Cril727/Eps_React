@@ -7,7 +7,12 @@ const Stack = createNativeStackNavigator();
 
 export function CitasStack() {
   return (
-    <Stack.Navigator>
+      <Stack.Navigator       
+        screenOptions={{
+        headerStyle: { backgroundColor: '#0c82eaff' },
+        headerTintColor: '#fff',
+        headerTitleAlign: 'start',
+      }}>
       <Stack.Screen name="Citas" component={Citas} />
     </Stack.Navigator>
   );
