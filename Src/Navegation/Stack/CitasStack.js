@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Citas from '../../../screens/pacientes/Citas';
+import Citas from '../../../screens/doctores/Citas';
 
 
 const Stack = createNativeStackNavigator();

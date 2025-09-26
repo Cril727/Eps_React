@@ -27,7 +27,6 @@ export default function Doctores() {
     email: '',
     telefono: '',
     estado: 'Activo',
-    password: '',
     rol_id: 2, // Doctor role
     especialidad_id: '',
   });
@@ -66,7 +65,6 @@ export default function Doctores() {
       email: '',
       telefono: '',
       estado: 'Activo',
-      password: '',
       rol_id: 2,
       especialidad_id: '',
     });
@@ -112,6 +110,12 @@ export default function Doctores() {
   };
 
   const handleSubmit = async () => {
+    // Validation
+    if (!formData.nombres.trim() || !formData.apellidos.trim() || !formData.email.trim() || !formData.especialidad_id) {
+      Alert.alert('Error', 'Por favor completa todos los campos obligatorios');
+      return;
+    }
+
     try {
       const dataToSend = {
         ...formData,
@@ -119,9 +123,7 @@ export default function Doctores() {
       };
 
       if (editingDoctor) {
-        // For updates, send a dummy password since backend requires it
-        const updateData = { ...dataToSend, password: 'dummy_password_for_update' };
-        await DoctoresService.updateDoctor(editingDoctor.id, updateData);
+        await DoctoresService.updateDoctor(editingDoctor.id, dataToSend);
         Alert.alert('Éxito', 'Doctor actualizado correctamente');
       } else {
         await DoctoresService.createDoctor(dataToSend);
@@ -182,7 +184,6 @@ export default function Doctores() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Gestión de Doctores</Text>
         <TouchableOpacity style={styles.addButton} onPress={handleCreate}>
           <Ionicons name="add" size={24} color="white" />
           <Text style={styles.addButtonText}>Nuevo Doctor</Text>
@@ -268,15 +269,6 @@ export default function Doctores() {
                 </Picker>
               </View>
 
-              {!editingDoctor && (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Contraseña"
-                  value={formData.password}
-                  onChangeText={(text) => setFormData({ ...formData, password: text })}
-                  secureTextEntry
-                />
-              )}
             </ScrollView>
 
             <View style={styles.modalActions}>
@@ -312,7 +304,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#0c82ea',
+    backgroundColor: '#ffffffff',
   },
   title: {
     fontSize: 20,

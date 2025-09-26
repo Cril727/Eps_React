@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import PacientesService from '../../Src/Services/PacientesService';
 import DoctoresService from '../../Src/Services/DoctoresService';
+import ConsultoriosService from '../../Src/Services/ConsultoriosService';
 import { getUserInfo } from '../../Src/Services/AuthService';
 
 export default function Citas() {
@@ -24,6 +25,8 @@ export default function Citas() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedHorario, setSelectedHorario] = useState(null);
+  const [consultorios, setConsultorios] = useState([]);
+  const [selectedConsultorio, setSelectedConsultorio] = useState(null);
   const [novedad, setNovedad] = useState('');
   const [userRole, setUserRole] = useState(null);
 
@@ -33,11 +36,18 @@ export default function Citas() {
       setUserRole(userInfo?.role);
 
       if (userInfo?.role === 'doctor') {
-        loadMisCitasDoctor();
-        loadCitasPendientesDoctor();
+        try {
+          await loadMisCitasDoctor();
+          await loadCitasPendientesDoctor();
+        } catch (error) {
+          console.error('Error loading doctor appointments:', error);
+        } finally {
+          setLoading(false);
+        }
       } else {
-        loadMisCitas();
-        loadDoctoresDisponibles();
+        Promise.all([loadMisCitas(), loadDoctoresDisponibles()]).finally(() =>
+          setLoading(false)
+        );
       }
     };
 
@@ -77,8 +87,6 @@ export default function Citas() {
       setDoctores(response.doctores_disponibles || []);
     } catch (error) {
       console.error('Error al cargar doctores:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -92,10 +100,22 @@ export default function Citas() {
     }
   };
 
+  const loadConsultoriosDisponibles = async (doctorId) => {
+    try {
+      const response = await PacientesService.getConsultoriosDisponibles(doctorId);
+      setConsultorios(response.consultorios_disponibles || []);
+    } catch (error) {
+      console.error('Error al cargar consultorios:', error);
+      Alert.alert('Error', 'No se pudieron cargar los consultorios disponibles');
+    }
+  };
+
   const handleSolicitarCita = () => {
     setSelectedDoctor(null);
     setSelectedHorario(null);
+    setSelectedConsultorio(null);
     setHorarios([]);
+    setConsultorios([]);
     setNovedad('');
     setModalVisible(true);
   };
@@ -103,33 +123,93 @@ export default function Citas() {
   const handleDoctorSelect = (doctor) => {
     setSelectedDoctor(doctor);
     setSelectedHorario(null);
+    setSelectedConsultorio(null);
     loadHorariosDisponibles(doctor.id);
+    loadConsultoriosDisponibles(doctor.id);
   };
 
   const handleHorarioSelect = (horario) => {
     setSelectedHorario(horario);
   };
 
+  const handleConsultorioSelect = (consultorio) => {
+    setSelectedConsultorio(consultorio);
+  };
+
   const handleSubmitCita = async () => {
-    if (!selectedDoctor || !selectedHorario) {
-      Alert.alert('Error', 'Por favor selecciona un doctor y un horario');
+    if (!selectedDoctor || !selectedHorario || !selectedConsultorio) {
+      Alert.alert('Error', 'Por favor selecciona un doctor, un horario y un consultorio');
       return;
     }
 
-    try {
-      const citaData = {
-        doctor_id: selectedDoctor.id,
-        consultorio_id: selectedDoctor.consultorio_id, // Asumiendo que el doctor tiene consultorio asignado
-        fechaHora: selectedHorario.horaInicio, // Usar la hora de inicio como fechaHora
-        novedad: novedad.trim() || 'Cita solicitada por el paciente',
-      };
+    const consultorioId = selectedConsultorio.id;
 
+    // Construcción robusta de fecha-hora ISO
+    const horaInicio = String(selectedHorario?.horaInicio || '');
+    const rawDate =
+      selectedHorario?.fecha ||
+      selectedHorario?.fechaDia ||
+      selectedHorario?.dia;
+
+    let fechaHoraISO = null;
+
+    if (selectedHorario?.fechaHora || selectedHorario?.fechaHoraInicio) {
+      const full = selectedHorario?.fechaHora || selectedHorario?.fechaHoraInicio;
+      const dt = new Date(full);
+      if (!isNaN(dt.getTime())) {
+        fechaHoraISO = dt.toISOString();
+      }
+    } else if (rawDate && horaInicio) {
+      // Combinar "YYYY-MM-DD" + "HH:mm"
+      const [y, m, d] = String(rawDate).split('-').map(Number);
+      const [hh, mm] = String(horaInicio).split(':').map(Number);
+      const dt = new Date(y || 1970, (m || 1) - 1, d || 1, hh || 0, mm || 0, 0, 0);
+      if (!isNaN(dt.getTime())) {
+        fechaHoraISO = dt.toISOString();
+      }
+    }
+
+    if (!fechaHoraISO && horaInicio) {
+      // Último recurso: mañana + horaInicio (para asegurar fecha futura)
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1); // Usar mañana
+      const [hh, mm] = String(horaInicio).split(':').map(Number);
+      const dt = new Date(
+        tomorrow.getFullYear(),
+        tomorrow.getMonth(),
+        tomorrow.getDate(),
+        hh || 0,
+        mm || 0,
+        0,
+        0
+      );
+      if (!isNaN(dt.getTime())) {
+        fechaHoraISO = dt.toISOString();
+      }
+    }
+
+    if (!fechaHoraISO) {
+      Alert.alert(
+        'Fecha incompleta',
+        'No fue posible construir una fechaHora válida. Verifica que el horario incluya fecha.'
+      );
+      return;
+    }
+
+    const citaData = {
+      doctor_id: selectedDoctor.id,
+      consultorio_id: consultorioId,
+      fechaHora: fechaHoraISO,
+      novedad: novedad.trim() || 'Cita solicitada por el paciente',
+    };
+
+    try {
       await PacientesService.solicitarCita(citaData);
       Alert.alert('Éxito', 'Cita solicitada correctamente');
       setModalVisible(false);
       loadMisCitas();
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || 'Error al solicitar la cita');
+      Alert.alert('Error', error?.response?.data?.message || 'Error al solicitar la cita');
     }
   };
 
@@ -139,7 +219,7 @@ export default function Citas() {
       Alert.alert('Éxito', 'Cita aprobada correctamente');
       loadMisCitasDoctor();
       loadCitasPendientesDoctor();
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'No se pudo aprobar la cita');
     }
   };
@@ -159,7 +239,7 @@ export default function Citas() {
               Alert.alert('Éxito', 'Cita rechazada correctamente');
               loadMisCitasDoctor();
               loadCitasPendientesDoctor();
-            } catch (error) {
+            } catch {
               Alert.alert('Error', 'No se pudo rechazar la cita');
             }
           },
@@ -204,7 +284,9 @@ export default function Citas() {
             Dr. {item.doctor?.nombres} {item.doctor?.apellidos}
           </Text>
         )}
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.estado) }]}>
+        <View
+          style={[styles.statusBadge, { backgroundColor: getStatusColor(item.estado) }]}
+        >
           <Text style={styles.statusText}>{item.estado}</Text>
         </View>
       </View>
@@ -215,19 +297,13 @@ export default function Citas() {
         </Text>
       )}
 
-      <Text style={styles.fechaText}>
-        {formatDateTime(item.fechaHora)}
-      </Text>
+      <Text style={styles.fechaText}>{formatDateTime(item.fechaHora)}</Text>
 
       <Text style={styles.consultorioText}>
         Consultorio: {item.consultorio?.codigo} - {item.consultorio?.ubicacion}
       </Text>
 
-      {item.novedad && (
-        <Text style={styles.novedadText}>
-          Nota: {item.novedad}
-        </Text>
-      )}
+      {!!item.novedad && <Text style={styles.novedadText}>Nota: {item.novedad}</Text>}
 
       {userRole === 'doctor' && item.estado === 'Programada' && (
         <View style={styles.doctorActions}>
@@ -250,40 +326,6 @@ export default function Citas() {
     </View>
   );
 
-  const renderDoctorOption = ({ item }) => (
-    <TouchableOpacity
-      style={[
-        styles.optionCard,
-        selectedDoctor?.id === item.id && styles.selectedOption,
-      ]}
-      onPress={() => handleDoctorSelect(item)}
-    >
-      <Text style={styles.optionTitle}>
-        Dr. {item.nombres} {item.apellidos}
-      </Text>
-      <Text style={styles.optionSubtitle}>
-        {item.especialidad?.especialidad}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderHorarioOption = ({ item }) => (
-    <TouchableOpacity
-      style={[
-        styles.optionCard,
-        selectedHorario?.id === item.id && styles.selectedOption,
-      ]}
-      onPress={() => handleHorarioSelect(item)}
-    >
-      <Text style={styles.optionTitle}>
-        {item.horaInicio} - {item.horaFin}
-      </Text>
-      <Text style={styles.optionSubtitle}>
-        Estado: {item.estado}
-      </Text>
-    </TouchableOpacity>
-  );
-
   if (loading) {
     return (
       <View style={styles.center}>
@@ -295,9 +337,7 @@ export default function Citas() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>
-          {userRole === 'doctor' ? 'Mis Citas' : 'Mis Citas'}
-        </Text>
+        <Text style={styles.title}>Mis Citas</Text>
         {userRole !== 'doctor' && (
           <TouchableOpacity style={styles.addButton} onPress={handleSolicitarCita}>
             <Ionicons name="add" size={24} color="white" />
@@ -308,7 +348,7 @@ export default function Citas() {
 
       {userRole === 'doctor' && citasPendientes.length > 0 && (
         <View style={styles.pendingSection}>
-          <Text style={styles.sectionTitle}>Citas Pendientes</Text>
+          <Text style={styles.listSectionTitle}>Citas Pendientes</Text>
           <FlatList
             data={citasPendientes}
             renderItem={renderCita}
@@ -320,7 +360,7 @@ export default function Citas() {
         </View>
       )}
 
-      <Text style={styles.sectionTitle}>
+      <Text style={styles.listSectionTitle}>
         {userRole === 'doctor' ? 'Todas mis Citas' : 'Mis Citas'}
       </Text>
 
@@ -334,16 +374,16 @@ export default function Citas() {
             <Text>
               {userRole === 'doctor'
                 ? 'No tienes citas asignadas'
-                : 'No tienes citas programadas'
-              }
+                : 'No tienes citas programadas'}
             </Text>
           </View>
         }
       />
 
+      {/* Modal: formulario simple, SIN FlatList dentro */}
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
@@ -351,32 +391,66 @@ export default function Citas() {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Solicitar Nueva Cita</Text>
 
-            <ScrollView style={styles.form}>
+            <ScrollView style={styles.form} contentContainerStyle={{ paddingBottom: 16 }}>
               {!selectedDoctor ? (
                 <>
-                  <Text style={styles.sectionTitle}>Selecciona un Doctor:</Text>
-                  <FlatList
-                    data={doctores}
-                    renderItem={renderDoctorOption}
-                    keyExtractor={(item) => item.id.toString()}
-                    style={styles.optionsList}
-                  />
+                  <Text style={styles.formSectionTitle}>Seleccionar Doctor:</Text>
+                  <View style={{ marginBottom: 12 }}>
+                    {doctores.length === 0 ? (
+                      <Text style={{ color: '#666' }}>No hay doctores disponibles</Text>
+                    ) : (
+                      doctores.map((item) => (
+                        <TouchableOpacity
+                          key={item.id}
+                          style={[
+                            styles.optionCard,
+                            selectedDoctor?.id === item.id && styles.selectedOption,
+                          ]}
+                          onPress={() => handleDoctorSelect(item)}
+                        >
+                          <Text style={styles.optionTitle}>
+                            Dr. {item.nombres} {item.apellidos}
+                          </Text>
+                          <Text style={styles.optionSubtitle}>
+                            {item.especialidad?.especialidad}
+                          </Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </View>
                 </>
               ) : !selectedHorario ? (
                 <>
-                  <Text style={styles.sectionTitle}>Doctor Seleccionado:</Text>
+                  <Text style={styles.formSectionTitle}>Doctor Seleccionado:</Text>
                   <View style={styles.selectedInfo}>
-                    <Text>Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}</Text>
+                    <Text>
+                      Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}
+                    </Text>
                     <Text>{selectedDoctor.especialidad?.especialidad}</Text>
                   </View>
 
-                  <Text style={styles.sectionTitle}>Selecciona un Horario:</Text>
-                  <FlatList
-                    data={horarios}
-                    renderItem={renderHorarioOption}
-                    keyExtractor={(item) => item.id.toString()}
-                    style={styles.optionsList}
-                  />
+                  <Text style={styles.formSectionTitle}>Selecciona un Horario:</Text>
+                  <View style={{ marginBottom: 12 }}>
+                    {horarios.length === 0 ? (
+                      <Text style={{ color: '#666' }}>No hay horarios disponibles</Text>
+                    ) : (
+                      horarios.map((item) => (
+                        <TouchableOpacity
+                          key={item.id}
+                          style={[
+                            styles.optionCard,
+                            selectedHorario?.id === item.id && styles.selectedOption,
+                          ]}
+                          onPress={() => handleHorarioSelect(item)}
+                        >
+                          <Text style={styles.optionTitle}>
+                            {item.horaInicio} - {item.horaFin}
+                          </Text>
+                          <Text style={styles.optionSubtitle}>Estado: {item.estado}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </View>
 
                   <TouchableOpacity
                     style={styles.backButton}
@@ -385,18 +459,68 @@ export default function Citas() {
                     <Text style={styles.backButtonText}>Cambiar Doctor</Text>
                   </TouchableOpacity>
                 </>
+              ) : !selectedConsultorio ? (
+                <>
+                  <Text style={styles.formSectionTitle}>Horario Seleccionado:</Text>
+                  <View style={styles.selectedInfo}>
+                    <Text>
+                      Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}
+                    </Text>
+                    <Text>{selectedDoctor.especialidad?.especialidad}</Text>
+                    <Text>{selectedHorario.horaInicio} - {selectedHorario.horaFin}</Text>
+                  </View>
+
+                  <Text style={styles.formSectionTitle}>Selecciona un Consultorio:</Text>
+                  <View style={{ marginBottom: 12 }}>
+                    {consultorios.length === 0 ? (
+                      <Text style={{ color: '#666' }}>No hay consultorios disponibles</Text>
+                    ) : (
+                      consultorios.map((item) => (
+                        <TouchableOpacity
+                          key={item.id}
+                          style={[
+                            styles.optionCard,
+                            selectedConsultorio?.id === item.id && styles.selectedOption,
+                          ]}
+                          onPress={() => handleConsultorioSelect(item)}
+                        >
+                          <Text style={styles.optionTitle}>
+                            {item.codigo} - {item.ubicacion}
+                          </Text>
+                          <Text style={styles.optionSubtitle}>Estado: {item.estado}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => setSelectedHorario(null)}
+                  >
+                    <Text style={styles.backButtonText}>Cambiar Horario</Text>
+                  </TouchableOpacity>
+                </>
               ) : (
                 <>
-                  <Text style={styles.sectionTitle}>Confirmar Cita:</Text>
+                  <Text style={styles.formSectionTitle}>Confirmar Cita:</Text>
                   <View style={styles.confirmationInfo}>
                     <Text style={styles.confirmTitle}>Doctor:</Text>
-                    <Text>Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}</Text>
+                    <Text>
+                      Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}
+                    </Text>
 
                     <Text style={styles.confirmTitle}>Especialidad:</Text>
                     <Text>{selectedDoctor.especialidad?.especialidad}</Text>
 
                     <Text style={styles.confirmTitle}>Horario:</Text>
-                    <Text>{selectedHorario.horaInicio} - {selectedHorario.horaFin}</Text>
+                    <Text>
+                      {selectedHorario.horaInicio} - {selectedHorario.horaFin}
+                    </Text>
+
+                    <Text style={styles.confirmTitle}>Consultorio:</Text>
+                    <Text>
+                      {selectedConsultorio.codigo} - {selectedConsultorio.ubicacion}
+                    </Text>
 
                     <Text style={styles.confirmTitle}>Nota adicional:</Text>
                     <TextInput
@@ -411,9 +535,9 @@ export default function Citas() {
 
                   <TouchableOpacity
                     style={styles.backButton}
-                    onPress={() => setSelectedHorario(null)}
+                    onPress={() => setSelectedConsultorio(null)}
                   >
-                    <Text style={styles.backButtonText}>Cambiar Horario</Text>
+                    <Text style={styles.backButtonText}>Cambiar Consultorio</Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -426,7 +550,7 @@ export default function Citas() {
               >
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
-              {selectedDoctor && selectedHorario && (
+              {selectedDoctor && selectedHorario && selectedConsultorio && (
                 <TouchableOpacity
                   style={[styles.modalButton, styles.saveButton]}
                   onPress={handleSubmitCita}
@@ -443,10 +567,7 @@ export default function Citas() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -454,11 +575,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#0c82ea',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-  },
+  title: { fontSize: 20, fontWeight: 'bold', color: 'white' },
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -467,14 +584,16 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 5,
   },
-  addButtonText: {
-    color: 'white',
-    marginLeft: 5,
+  addButtonText: { color: 'white', marginLeft: 5, fontWeight: 'bold' },
+  list: { padding: 10 },
+  listSectionTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
+    marginLeft: 10,
+    marginBottom: 10,
   },
-  list: {
-    padding: 10,
-  },
+
   citaCard: {
     backgroundColor: 'white',
     borderRadius: 10,
@@ -492,48 +611,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  doctorName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  especialidadText: {
-    fontSize: 14,
-    color: '#0c82ea',
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  fechaText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  consultorioText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  novedadText: {
-    fontSize: 14,
-    color: '#666',
-    fontStyle: 'italic',
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  doctorName: { fontSize: 16, fontWeight: 'bold', color: '#333', flex: 1 },
+  statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
+  statusText: { color: 'white', fontSize: 12, fontWeight: 'bold' },
+  especialidadText: { fontSize: 14, color: '#0c82ea', fontWeight: '500', marginBottom: 4 },
+  fechaText: { fontSize: 14, color: '#666', marginBottom: 4 },
+  consultorioText: { fontSize: 14, color: '#666', marginBottom: 4 },
+  novedadText: { fontSize: 14, color: '#666', fontStyle: 'italic' },
+
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
+  // MODAL
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -547,24 +635,11 @@ const styles = StyleSheet.create({
     width: '90%',
     maxHeight: '80%',
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  form: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
-  },
-  optionsList: {
-    maxHeight: 200,
-  },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+
+  form: { marginBottom: 20 },
+  formSectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 10, color: '#333' },
+
   optionCard: {
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
@@ -573,38 +648,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#dee2e6',
   },
-  selectedOption: {
-    backgroundColor: '#e3f2fd',
-    borderColor: '#0c82ea',
-  },
-  optionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  optionSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
-  },
-  selectedInfo: {
-    backgroundColor: '#e3f2fd',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  confirmationInfo: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  confirmTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 8,
-  },
+  selectedOption: { backgroundColor: '#e3f2fd', borderColor: '#0c82ea' },
+  optionTitle: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+  optionSubtitle: { fontSize: 14, color: '#666', marginTop: 2 },
+
+  selectedInfo: { backgroundColor: '#e3f2fd', padding: 12, borderRadius: 8, marginBottom: 15 },
+  confirmationInfo: { backgroundColor: '#f8f9fa', padding: 15, borderRadius: 8, marginBottom: 15 },
+  confirmTitle: { fontSize: 14, fontWeight: 'bold', color: '#333', marginTop: 8 },
+
   noteInput: {
     borderWidth: 1,
     borderColor: '#ddd',
@@ -614,57 +665,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlignVertical: 'top',
   },
-  backButton: {
-    alignSelf: 'center',
-    padding: 10,
-    marginTop: 10,
-  },
-  backButtonText: {
-    color: '#0c82ea',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  modalButton: {
-    flex: 1,
-    padding: 15,
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  cancelButton: {
-    backgroundColor: '#6c757d',
-  },
-  saveButton: {
-    backgroundColor: '#0c82ea',
-  },
-  cancelButtonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  saveButtonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  pendingSection: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginLeft: 10,
-    marginBottom: 10,
-  },
-  doctorActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
+
+  backButton: { alignSelf: 'center', padding: 10, marginTop: 10 },
+  backButtonText: { color: '#0c82ea', fontSize: 14, fontWeight: 'bold' },
+
+  modalActions: { flexDirection: 'row', justifyContent: 'space-between' },
+  modalButton: { flex: 1, padding: 15, borderRadius: 5, marginHorizontal: 5 },
+  cancelButton: { backgroundColor: '#6c757d' },
+  saveButton: { backgroundColor: '#0c82ea' },
+  cancelButtonText: { color: 'white', textAlign: 'center', fontWeight: 'bold' },
+  saveButtonText: { color: 'white', textAlign: 'center', fontWeight: 'bold' },
+
+  pendingSection: { marginBottom: 20 },
+
+  doctorActions: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
   doctorActionButton: {
     flex: 1,
     flexDirection: 'row',
@@ -674,15 +688,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: 5,
   },
-  approveButton: {
-    backgroundColor: '#28a745',
-  },
-  rejectButton: {
-    backgroundColor: '#dc3545',
-  },
-  doctorActionText: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginLeft: 5,
-  },
+  approveButton: { backgroundColor: '#28a745' },
+  rejectButton: { backgroundColor: '#dc3545' },
+  doctorActionText: { color: 'white', fontWeight: 'bold', marginLeft: 5 },
 });

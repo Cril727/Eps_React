@@ -9,7 +9,8 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getUserProfile, logout, getUserInfo } from '../../Src/Services/AuthService';
+import { logout, getUserInfo } from '../../Src/Services/AuthService';
+import { DeviceEventEmitter } from 'react-native';
 
 export default function Profile({ navigation }) {
   const [userProfile, setUserProfile] = useState(null);
@@ -19,45 +20,32 @@ export default function Profile({ navigation }) {
 
   useEffect(() => {
     initializeProfile();
+
+    // Listen for profile updates
+    const subscription = DeviceEventEmitter.addListener('tokenUpdated', () => {
+      initializeProfile();
+    });
+
+    return () => subscription.remove();
   }, []);
 
   const initializeProfile = async () => {
     const userInfo = await getUserInfo();
     if (userInfo && userInfo.role) {
       setUserRole(userInfo.role);
-      if (userInfo.role === 'paciente') {
-        // For patients, use stored user info
-        setUserProfile(userInfo);
-        setLoading(false);
-      } else {
-        // For doctors and admins, load from API
-        loadProfile();
-      }
+      // Use stored user info for all roles to avoid API calls that could log out users
+      setUserProfile(userInfo);
+      setLoading(false);
     } else {
       setLoading(false);
     }
   };
 
-  const loadProfile = async () => {
-    try {
-      const result = await getUserProfile();
-      if (result.success) {
-        setUserProfile(result.user);
-      } else {
-        Alert.alert('Error', result.message);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Error al cargar el perfil');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    if (userRole !== 'paciente') {
-      await loadProfile();
-    }
+    // Since we're now using local storage for all roles, no API call needed on refresh
+    // The profile data is already loaded from local storage
     setRefreshing(false);
   };
 

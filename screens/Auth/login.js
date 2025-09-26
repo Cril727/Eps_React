@@ -104,13 +104,13 @@ export default function Login({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flexGrow: 1, backgroundColor: "#f1fcffff", justifyContent: "center", alignItems: "center", padding: 24 },
-  card: { width: "100%", maxWidth: 400, backgroundColor: "#FFFFFF", borderRadius: 18, padding: 22, borderWidth: 1, borderColor: "#E6E1FF", alignItems: "center", borderTopWidth: 4, borderTopColor: "#28ad4eff", elevation: 2 },
+  card: { width: "100%", maxWidth: 400, backgroundColor: "#FFFFFF", borderRadius: 18, padding: 22, borderWidth: 1, borderColor: "#E6E1FF", alignItems: "center", borderTopWidth: 4, borderTopColor: "#2878adff", elevation: 2 },
   title: { fontSize: 26, fontWeight: "800", color: "#0F172A", letterSpacing: 0.2, marginBottom: 6, textAlign: "center" },
   subtitle: { fontSize: 14, color: "#6B7280", marginBottom: 20, textAlign: "center" },
   input: { width: "100%", paddingVertical: 12, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, borderColor: "#E6E1FF", marginBottom: 12, backgroundColor: "#fff" },
-  forgotPassword: { alignSelf: "flex-end", fontSize: 13, color: "#3a64edff", textDecorationLine: "underline", marginBottom: 18 },
-  button: { backgroundColor: "#42a34fff", paddingVertical: 14, borderRadius: 999, width: "100%", alignItems: "center", marginBottom: 16, borderWidth: 2, borderColor: "#20af24ff" },
+  forgotPassword: { alignSelf: "flex-end", fontSize: 13, color: "#0a3eeaff", textDecorationLine: "underline", marginBottom: 18 },
+  button: { backgroundColor: "#6bb0d8ff", paddingVertical: 14, borderRadius: 999, width: "100%", alignItems: "center", marginBottom: 16, borderWidth: 2, borderColor: "#ffffffff" },
   buttonText: { color: "#FFFFFF", fontWeight: "800", fontSize: 16, letterSpacing: 0.4, textTransform: "uppercase" },
   footerText: { fontSize: 14, color: "#4B5563", textAlign: "center" },
-  link: { color: "#2b845eff", fontWeight: "700", textDecorationLine: "underline" },
+  link: { color: "#317abaff", fontWeight: "700", textDecorationLine: "underline" },
 });

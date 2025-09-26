@@ -19,6 +19,30 @@ export const registerUser = async (name, email, password, rol) => {
     }
 };
 
+export const registerPatient = async (nombres, apellidos, email, telefono, password) => {
+    try {
+        const response = await api.post("api/register", {
+            nombres,
+            apellidos,
+            email,
+            telefono,
+            password
+        });
+        console.log("Respuesta del registro de paciente", response.data);
+        return { success: true, message: response.data.message, paciente: response.data.paciente };
+    } catch (e) {
+        console.log(
+            "Error al registrar paciente",
+            e.response ? e.response.data : e.message,
+        );
+        return {
+            success: false,
+            message: e.response?.data?.message || "Error de conexión",
+            errors: e.response?.data?.errors
+        };
+    }
+};
+
 export const loginUser = async (email, password) => {
     try {
         const response = await api.post("api/login", { email, password });

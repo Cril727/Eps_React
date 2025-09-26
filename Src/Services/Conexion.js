@@ -23,6 +23,11 @@ api.interceptors.request.use(
     let token = null;
     if (!esRutaPublica) {
       token = await AsyncStorage.getItem("userToken");
+      const userInfo = await AsyncStorage.getItem("userInfo");
+      if (userInfo) {
+        const parsedUserInfo = JSON.parse(userInfo);
+        config.headers['X-User-Guard'] = parsedUserInfo.guard || 'apiPaciente';
+      }
     }
 
     if (token) {

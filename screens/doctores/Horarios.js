@@ -102,8 +102,7 @@ export default function Horarios() {
     }
 
     try {
-      const userInfo = await getUserInfo();
-      const dataToSend = { ...formData, doctor_id: userInfo.id };
+      const dataToSend = formData;
 
       if (editingHorario) {
         await DoctoresService.updateHorario(editingHorario.id, dataToSend);

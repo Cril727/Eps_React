@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -47,14 +47,18 @@ export default function Usuarios() {
     }
   };
 
-  const loadRoles = async () => {
+  const loadRoles = useCallback(async () => {
     try {
       const response = await RolesService.getRoles();
-      setRoles(response.roles || []);
+      const rolesData = response.roles || [];
+      // Remove duplicates based on id
+      const uniqueRoles = [...new Map(rolesData.map(rol => [rol.id, rol])).values()];
+      setRoles(uniqueRoles);
     } catch (error) {
       console.error('Error al cargar roles:', error);
     }
-  };
+  }, []);
+
 
   const handleCreate = () => {
     setEditingUsuario(null);
@@ -64,7 +68,7 @@ export default function Usuarios() {
       email: '',
       telefono: '',
       password: '',
-      rol_id: '',
+      rol_id: 1, // Admin role by default (ID 1 in database as number)
     });
     setModalVisible(true);
   };
@@ -106,7 +110,7 @@ export default function Usuarios() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.nombres.trim() || !formData.email.trim() || !formData.rol_id) {
+    if (!formData.nombres.trim() || !formData.email.trim()) {
       Alert.alert('Error', 'Por favor completa todos los campos obligatorios');
       return;
     }
@@ -200,7 +204,6 @@ export default function Usuarios() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Gestión de Usuarios</Text>
         <TouchableOpacity style={styles.addButton} onPress={handleCreate}>
           <Ionicons name="add" size={24} color="white" />
           <Text style={styles.addButtonText}>Nuevo Usuario</Text>
@@ -260,19 +263,6 @@ export default function Usuarios() {
                 keyboardType="phone-pad"
               />
 
-              <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Rol *:</Text>
-                <Picker
-                  selectedValue={formData.rol_id}
-                  onValueChange={(value) => setFormData({ ...formData, rol_id: value })}
-                  style={styles.picker}
-                >
-                  <Picker.Item label="Seleccionar rol..." value="" />
-                  {roles.map((rol) => (
-                    <Picker.Item key={rol.id} label={rol.rol} value={rol.id.toString()} />
-                  ))}
-                </Picker>
-              </View>
 
               {!editingUsuario && (
                 <TextInput
@@ -314,11 +304,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     padding: 20,
-    backgroundColor: '#0c82ea',
+    backgroundColor: '#ffffffff',
   },
   title: {
     fontSize: 20,

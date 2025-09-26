@@ -8,30 +8,37 @@
   } from "react-native";
   import { useState } from "react";
   import TextInputComponent from "../../components/TextInputComponent";
-  import { registerUser } from "../../Src/Services/AuthService";
+  import { registerPatient } from "../../Src/Services/AuthService";
 
   export default function Register({ navigation }) {
-    const [name, setName] = useState("");
+    const [nombres, setNombres] = useState("");
+    const [apellidos, setApellidos] = useState("");
     const [email, setEmail] = useState("");
+    const [telefono, setTelefono] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [rol, setRol] = useState("");
 
     const handleRegister = async () => {
       if (password !== confirmPassword) {
         Alert.alert("Error", "Las contraseñas no coinciden");
         return;
       }
-      if (!name || !email || !password || !rol) {
+      if (!nombres || !apellidos || !email || !telefono || !password) {
         Alert.alert("Error", "Todos los campos son obligatorios");
         return;
       }
-      const result = await registerUser(name, email, password, rol);
+      const result = await registerPatient(nombres, apellidos, email, telefono, password);
       if (result.success) {
         Alert.alert("Éxito", result.message);
         navigation.navigate("Login");
       } else {
-        Alert.alert("Error", result.message);
+        // Handle validation errors
+        if (result.errors) {
+          const errorMessages = Object.values(result.errors).flat().join('\n');
+          Alert.alert("Error de validación", errorMessages);
+        } else {
+          Alert.alert("Error", result.message);
+        }
       }
     };
 
@@ -45,16 +52,31 @@
           {/* Inputs */}
           <View style={styles.form}>
             <TextInputComponent
-              label="Nombre Completo"
-              placeholder="Ej: Juan Pérez"
-              value={name}
-              onChangeText={setName}
+              label="Nombres"
+              placeholder="Ej: Juan Carlos"
+              value={nombres}
+              onChangeText={setNombres}
+            />
+            <TextInputComponent
+              label="Apellidos"
+              placeholder="Ej: Pérez García"
+              value={apellidos}
+              onChangeText={setApellidos}
             />
             <TextInputComponent
               label="Correo Electrónico"
               placeholder="ejemplo@email.com"
               value={email}
               onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <TextInputComponent
+              label="Teléfono"
+              placeholder="Ej: 3001234567"
+              value={telefono}
+              onChangeText={setTelefono}
+              keyboardType="phone-pad"
             />
             <TextInputComponent
               label="Contraseña"
@@ -69,12 +91,6 @@
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
-            />
-            <TextInputComponent
-              label="Rol"
-              placeholder="Ej: admin, user"
-              value={rol}
-              onChangeText={setRol}
             />
           </View>
 

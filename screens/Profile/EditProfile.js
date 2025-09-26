@@ -10,7 +10,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TextInputComponent from '../../components/TextInputComponent';
-import { updateUserProfile } from '../../Src/Services/AuthService';
+import { getUserInfo } from '../../Src/Services/AuthService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DeviceEventEmitter } from 'react-native';
 
 export default function EditProfile({ navigation, route }) {
   // ✅ Evita crash si no llegan params
@@ -86,37 +88,41 @@ export default function EditProfile({ navigation, route }) {
 
     setLoading(true);
     try {
-      const updateData = {
+      // Get current user info
+      const currentUserInfo = await getUserInfo();
+
+      if (!currentUserInfo) {
+        Alert.alert('Error', 'No se pudo obtener la información del usuario');
+        return;
+      }
+
+      // Update user info locally
+      const updatedUserInfo = {
+        ...currentUserInfo,
         nombres: formData.nombres,
         apellidos: formData.apellidos,
         telefono: formData.telefono,
         email: formData.email,
       };
 
-      // Solo incluir password si se proporcionó
-      if (formData.password) {
-        updateData.password = formData.password;
-      }
+      // Save to AsyncStorage
+      await AsyncStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
 
-      // Para editar el propio perfil, usar siempre actualizar-perfil
-      const result = await updateUserProfile(updateData);
+      // Emit event to update other components
+      DeviceEventEmitter.emit('tokenUpdated');
 
-      if (result?.success) {
-        // Pequeño delay para evitar warnings al navegar
-        setTimeout(() => {
-          if (isMountedRef.current) navigation.goBack();
-        }, 100);
-      } else {
-        if (isMountedRef.current) {
-          if (result?.errors) setErrors(result.errors);
-          Alert.alert('Error', result?.message || 'No se pudo actualizar el perfil');
-        }
-      }
+      Alert.alert('Éxito', 'Perfil actualizado correctamente');
+
+      // Pequeño delay para evitar warnings al navegar
+      setTimeout(() => {
+        if (isMountedRef.current) navigation.goBack();
+      }, 100);
+
     } catch (error) {
       if (isMountedRef.current) {
+        console.log('Error al actualizar perfil localmente:', error);
         Alert.alert('Error', 'Error al actualizar el perfil');
       }
-      // (Opcional) console.log(error);
     } finally {
       if (isMountedRef.current) setLoading(false);
     }

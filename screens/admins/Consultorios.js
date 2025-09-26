@@ -169,7 +169,6 @@ export default function Consultorios() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Gestión de Consultorios</Text>
         <TouchableOpacity style={styles.addButton} onPress={handleCreate}>
           <Ionicons name="add" size={24} color="white" />
           <Text style={styles.addButtonText}>Nuevo Consultorio</Text>
@@ -273,7 +272,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#0c82ea',
+    backgroundColor: '#ffffffff',
   },
   title: {
     fontSize: 20,

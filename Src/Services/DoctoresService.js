@@ -1,4 +1,20 @@
 import api from './Conexion';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Helper function to get user role
+const getUserRole = async () => {
+  try {
+    const userInfo = await AsyncStorage.getItem('userInfo');
+    if (userInfo) {
+      const parsed = JSON.parse(userInfo);
+      return parsed.role;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting user role:', error);
+    return null;
+  }
+};
 
 const DoctoresService = {
   // Obtener todos los doctores
@@ -56,10 +72,12 @@ const DoctoresService = {
     }
   },
 
-  // Métodos específicos para doctores autenticados
+  // Métodos específicos para doctores y admins autenticados
   getMisCitas: async () => {
     try {
-      const response = await api.get('api/mis-citas');
+      const userRole = await getUserRole();
+      const endpoint = userRole === 'doctor' ? 'api/doctor/mis-citas' : 'api/mis-citas';
+      const response = await api.get(endpoint);
       return response.data;
     } catch (error) {
       console.error('Error al obtener mis citas:', error);
@@ -69,7 +87,9 @@ const DoctoresService = {
 
   getMisCitasPendientes: async () => {
     try {
-      const response = await api.get('api/mis-citas-pendientes');
+      const userRole = await getUserRole();
+      const endpoint = userRole === 'doctor' ? 'api/doctor/mis-citas-pendientes' : 'api/mis-citas-pendientes';
+      const response = await api.get(endpoint);
       return response.data;
     } catch (error) {
       console.error('Error al obtener citas pendientes:', error);
@@ -79,7 +99,9 @@ const DoctoresService = {
 
   aprobarCita: async (id) => {
     try {
-      const response = await api.put(`api/aprobar-cita/${id}`);
+      const userRole = await getUserRole();
+      const endpoint = userRole === 'doctor' ? `api/doctor/aprobar-cita/${id}` : `api/aprobar-cita/${id}`;
+      const response = await api.put(endpoint);
       return response.data;
     } catch (error) {
       console.error('Error al aprobar cita:', error);
@@ -89,7 +111,9 @@ const DoctoresService = {
 
   rechazarCita: async (id) => {
     try {
-      const response = await api.put(`api/rechazar-cita/${id}`);
+      const userRole = await getUserRole();
+      const endpoint = userRole === 'doctor' ? `api/doctor/rechazar-cita/${id}` : `api/rechazar-cita/${id}`;
+      const response = await api.put(endpoint);
       return response.data;
     } catch (error) {
       console.error('Error al rechazar cita:', error);
@@ -99,8 +123,8 @@ const DoctoresService = {
 
   getMisHorarios: async () => {
     try {
-      const response = await api.get('api/mis-horarios');
-      return {horarios: response.data.mis_horarios};
+      const response = await api.get('api/doctor/mis-horarios');
+      return response.data;
     } catch (error) {
       console.error('Error al obtener mis horarios:', error);
       throw error;
@@ -109,7 +133,7 @@ const DoctoresService = {
 
   getMiConsultorio: async () => {
     try {
-      const response = await api.get('api/mi-consultorio');
+      const response = await api.get('api/doctor/mi-consultorio');
       return { consultorio: response.data.mi_consultorio };
     } catch (error) {
       console.error('Error al obtener mi consultorio:', error);
@@ -119,7 +143,7 @@ const DoctoresService = {
 
   createHorario: async (horarioData) => {
     try {
-      const response = await api.post('api/addHorario', horarioData);
+      const response = await api.post('api/doctor/addHorario', horarioData);
       return response.data;
     } catch (error) {
       console.error('Error al crear horario:', error);
@@ -129,7 +153,7 @@ const DoctoresService = {
 
   updateHorario: async (id, horarioData) => {
     try {
-      const response = await api.put(`api/updateHorario/${id}`, horarioData);
+      const response = await api.put(`api/doctor/updateHorario/${id}`, horarioData);
       return response.data;
     } catch (error) {
       console.error('Error al actualizar horario:', error);
@@ -139,7 +163,7 @@ const DoctoresService = {
 
   deleteHorario: async (id) => {
     try {
-      const response = await api.delete(`api/deleteHorario/${id}`);
+      const response = await api.delete(`api/doctor/deleteHorario/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error al eliminar horario:', error);
