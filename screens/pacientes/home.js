@@ -25,7 +25,6 @@ export default function Home({ navigation }) {
     if (userRole === 'doctor') {
       return [
         { title: 'Mis Citas', subtitle: 'Ver y gestionar citas', icon: 'calendar', screen: 'MisCitas', color: '#0c82ea' },
-        { title: 'Mi Consultorio', subtitle: 'Ver información de consultorio', icon: 'business', screen: 'MiConsultorio', color: '#28a745' },
         { title: 'Mi Perfil', subtitle: 'Ver y editar información', icon: 'person', screen: 'Perfil', color: '#6c757d' },
       ];
     }

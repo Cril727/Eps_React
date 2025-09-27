@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     borderColor: "#E6E1FF",
     alignItems: "center",
     borderTopWidth: 4,
-    borderTopColor: "#28ad4eff",
+    borderTopColor: "#2890adff",
     elevation: 2,
   },
   title: {
@@ -157,14 +157,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   button: {
-    backgroundColor: "#42a34fff",
+    backgroundColor: "#428ea3ff",
     paddingVertical: 14,
     borderRadius: 999,
     width: "100%",
     alignItems: "center",
     marginBottom: 16,
     borderWidth: 2,
-    borderColor: "#20af24ff",
+    borderColor: "#ffffffff",
   },
   buttonText: {
     color: "#FFFFFF",
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   link: {
-    color: "#2b845eff",
+    color: "#2b7484ff",
     fontWeight: "700",
     textDecorationLine: "underline",
   },

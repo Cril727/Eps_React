@@ -15,6 +15,7 @@ import PacientesService from '../../Src/Services/PacientesService';
 import DoctoresService from '../../Src/Services/DoctoresService';
 import ConsultoriosService from '../../Src/Services/ConsultoriosService';
 import { getUserInfo } from '../../Src/Services/AuthService';
+import { AppointmentCard, SelectionCard, LoadingSpinner, EmptyState, Header } from '../../components';
 
 export default function Citas() {
   const [citas, setCitas] = useState([]);
@@ -248,18 +249,6 @@ export default function Citas() {
     );
   };
 
-  const getStatusColor = (estado) => {
-    switch (estado) {
-      case 'Programada':
-        return '#ffc107';
-      case 'Completada':
-        return '#28a745';
-      case 'Rechazada':
-        return '#dc3545';
-      default:
-        return '#6c757d';
-    }
-  };
 
   const formatDateTime = (dateTimeString) => {
     const date = new Date(dateTimeString);
@@ -273,78 +262,27 @@ export default function Citas() {
   };
 
   const renderCita = ({ item }) => (
-    <View style={styles.citaCard}>
-      <View style={styles.citaHeader}>
-        {userRole === 'doctor' ? (
-          <Text style={styles.doctorName}>
-            Paciente: {item.paciente?.nombres} {item.paciente?.apellidos}
-          </Text>
-        ) : (
-          <Text style={styles.doctorName}>
-            Dr. {item.doctor?.nombres} {item.doctor?.apellidos}
-          </Text>
-        )}
-        <View
-          style={[styles.statusBadge, { backgroundColor: getStatusColor(item.estado) }]}
-        >
-          <Text style={styles.statusText}>{item.estado}</Text>
-        </View>
-      </View>
-
-      {userRole !== 'doctor' && (
-        <Text style={styles.especialidadText}>
-          {item.doctor?.especialidad?.especialidad}
-        </Text>
-      )}
-
-      <Text style={styles.fechaText}>{formatDateTime(item.fechaHora)}</Text>
-
-      <Text style={styles.consultorioText}>
-        Consultorio: {item.consultorio?.codigo} - {item.consultorio?.ubicacion}
-      </Text>
-
-      {!!item.novedad && <Text style={styles.novedadText}>Nota: {item.novedad}</Text>}
-
-      {userRole === 'doctor' && item.estado === 'Programada' && (
-        <View style={styles.doctorActions}>
-          <TouchableOpacity
-            style={[styles.doctorActionButton, styles.approveButton]}
-            onPress={() => handleAprobarCita(item.id)}
-          >
-            <Ionicons name="checkmark" size={16} color="white" />
-            <Text style={styles.doctorActionText}>Aprobar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.doctorActionButton, styles.rejectButton]}
-            onPress={() => handleRechazarCita(item.id)}
-          >
-            <Ionicons name="close" size={16} color="white" />
-            <Text style={styles.doctorActionText}>Rechazar</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
+    <AppointmentCard
+      item={item}
+      userRole={userRole}
+      onApprove={handleAprobarCita}
+      onReject={handleRechazarCita}
+      formatDateTime={formatDateTime}
+    />
   );
 
   if (loading) {
-    return (
-      <View style={styles.center}>
-        <Text>Cargando citas...</Text>
-      </View>
-    );
+    return <LoadingSpinner message="Cargando citas..." />;
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Mis Citas</Text>
-        {userRole !== 'doctor' && (
-          <TouchableOpacity style={styles.addButton} onPress={handleSolicitarCita}>
-            <Ionicons name="add" size={24} color="white" />
-            <Text style={styles.addButtonText}>Solicitar Cita</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      <Header
+        title="Mis Citas"
+        onAdd={userRole !== 'doctor' ? handleSolicitarCita : null}
+        addText="Solicitar Cita"
+        showAdd={userRole !== 'doctor'}
+      />
 
       {userRole === 'doctor' && citasPendientes.length > 0 && (
         <View style={styles.pendingSection}>
@@ -370,13 +308,14 @@ export default function Citas() {
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
-          <View style={styles.center}>
-            <Text>
-              {userRole === 'doctor'
+          <EmptyState
+            title="No hay citas"
+            message={
+              userRole === 'doctor'
                 ? 'No tienes citas asignadas'
-                : 'No tienes citas programadas'}
-            </Text>
-          </View>
+                : 'No tienes citas programadas'
+            }
+          />
         }
       />
 
@@ -400,21 +339,14 @@ export default function Citas() {
                       <Text style={{ color: '#666' }}>No hay doctores disponibles</Text>
                     ) : (
                       doctores.map((item) => (
-                        <TouchableOpacity
+                        <SelectionCard
                           key={item.id}
-                          style={[
-                            styles.optionCard,
-                            selectedDoctor?.id === item.id && styles.selectedOption,
-                          ]}
-                          onPress={() => handleDoctorSelect(item)}
-                        >
-                          <Text style={styles.optionTitle}>
-                            Dr. {item.nombres} {item.apellidos}
-                          </Text>
-                          <Text style={styles.optionSubtitle}>
-                            {item.especialidad?.especialidad}
-                          </Text>
-                        </TouchableOpacity>
+                          item={item}
+                          isSelected={selectedDoctor?.id === item.id}
+                          onPress={handleDoctorSelect}
+                          title={`Dr. ${item.nombres} ${item.apellidos}`}
+                          subtitle={item.especialidad?.especialidad}
+                        />
                       ))
                     )}
                   </View>
@@ -435,19 +367,15 @@ export default function Citas() {
                       <Text style={{ color: '#666' }}>No hay horarios disponibles</Text>
                     ) : (
                       horarios.map((item) => (
-                        <TouchableOpacity
+                        <SelectionCard
                           key={item.id}
-                          style={[
-                            styles.optionCard,
-                            selectedHorario?.id === item.id && styles.selectedOption,
-                          ]}
-                          onPress={() => handleHorarioSelect(item)}
-                        >
-                          <Text style={styles.optionTitle}>
-                            {item.horaInicio} - {item.horaFin}
-                          </Text>
-                          <Text style={styles.optionSubtitle}>Estado: {item.estado}</Text>
-                        </TouchableOpacity>
+                          item={item}
+                          isSelected={selectedHorario?.id === item.id}
+                          onPress={handleHorarioSelect}
+                          title={`${item.horaInicio} - ${item.horaFin}`}
+                          subtitle={`Estado: ${item.estado}`}
+                          showEstado={false}
+                        />
                       ))
                     )}
                   </View>
@@ -476,19 +404,15 @@ export default function Citas() {
                       <Text style={{ color: '#666' }}>No hay consultorios disponibles</Text>
                     ) : (
                       consultorios.map((item) => (
-                        <TouchableOpacity
+                        <SelectionCard
                           key={item.id}
-                          style={[
-                            styles.optionCard,
-                            selectedConsultorio?.id === item.id && styles.selectedOption,
-                          ]}
-                          onPress={() => handleConsultorioSelect(item)}
-                        >
-                          <Text style={styles.optionTitle}>
-                            {item.codigo} - {item.ubicacion}
-                          </Text>
-                          <Text style={styles.optionSubtitle}>Estado: {item.estado}</Text>
-                        </TouchableOpacity>
+                          item={item}
+                          isSelected={selectedConsultorio?.id === item.id}
+                          onPress={handleConsultorioSelect}
+                          title={`${item.codigo} - ${item.ubicacion}`}
+                          subtitle={`Estado: ${item.estado}`}
+                          showEstado={false}
+                        />
                       ))
                     )}
                   </View>
@@ -568,23 +492,6 @@ export default function Citas() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#0c82ea',
-  },
-  title: { fontSize: 20, fontWeight: 'bold', color: 'white' },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#28a745',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 5,
-  },
-  addButtonText: { color: 'white', marginLeft: 5, fontWeight: 'bold' },
   list: { padding: 10 },
   listSectionTitle: {
     fontSize: 18,
@@ -593,33 +500,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginBottom: 10,
   },
-
-  citaCard: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  citaHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  doctorName: { fontSize: 16, fontWeight: 'bold', color: '#333', flex: 1 },
-  statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
-  statusText: { color: 'white', fontSize: 12, fontWeight: 'bold' },
-  especialidadText: { fontSize: 14, color: '#0c82ea', fontWeight: '500', marginBottom: 4 },
-  fechaText: { fontSize: 14, color: '#666', marginBottom: 4 },
-  consultorioText: { fontSize: 14, color: '#666', marginBottom: 4 },
-  novedadText: { fontSize: 14, color: '#666', fontStyle: 'italic' },
-
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
   // MODAL
   modalOverlay: {
@@ -639,18 +519,6 @@ const styles = StyleSheet.create({
 
   form: { marginBottom: 20 },
   formSectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 10, color: '#333' },
-
-  optionCard: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#dee2e6',
-  },
-  selectedOption: { backgroundColor: '#e3f2fd', borderColor: '#0c82ea' },
-  optionTitle: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  optionSubtitle: { fontSize: 14, color: '#666', marginTop: 2 },
 
   selectedInfo: { backgroundColor: '#e3f2fd', padding: 12, borderRadius: 8, marginBottom: 15 },
   confirmationInfo: { backgroundColor: '#f8f9fa', padding: 15, borderRadius: 8, marginBottom: 15 },
@@ -677,18 +545,4 @@ const styles = StyleSheet.create({
   saveButtonText: { color: 'white', textAlign: 'center', fontWeight: 'bold' },
 
   pendingSection: { marginBottom: 20 },
-
-  doctorActions: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
-  doctorActionButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 8,
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  approveButton: { backgroundColor: '#28a745' },
-  rejectButton: { backgroundColor: '#dc3545' },
-  doctorActionText: { color: 'white', fontWeight: 'bold', marginLeft: 5 },
 });

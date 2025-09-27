@@ -122,6 +122,11 @@ export default function Doctores() {
         especialidad_id: parseInt(formData.especialidad_id),
       };
 
+      // Remove password if empty for updates
+      if (!dataToSend.password || dataToSend.password.trim() === '') {
+        delete dataToSend.password;
+      }
+
       if (editingDoctor) {
         await DoctoresService.updateDoctor(editingDoctor.id, dataToSend);
         Alert.alert('Éxito', 'Doctor actualizado correctamente');
