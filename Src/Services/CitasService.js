@@ -7,7 +7,6 @@ const CitasService = {
       const response = await api.get('api/citas');
       return response.data;
     } catch (error) {
-      console.error('Error al obtener citas:', error);
       throw error;
     }
   },
@@ -18,7 +17,6 @@ const CitasService = {
       const response = await api.post('api/addCita', citaData);
       return response.data;
     } catch (error) {
-      console.error('Error al crear cita:', error);
       throw error;
     }
   },
@@ -29,7 +27,6 @@ const CitasService = {
       const response = await api.put(`api/updateCita/${id}`, citaData);
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar cita:', error);
       throw error;
     }
   },
@@ -40,7 +37,6 @@ const CitasService = {
       const response = await api.delete(`api/deleteCita/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al eliminar cita:', error);
       throw error;
     }
   },
@@ -51,7 +47,6 @@ const CitasService = {
       const response = await api.get(`api/citaById/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener cita:', error);
       throw error;
     }
   },

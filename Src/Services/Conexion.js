@@ -1,7 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const URL_BASE = "http://10.219.26.16:8000";
+const URL_BASE = "http://192.168.1.102:8000";
 
 const api = axios.create({
   baseURL: URL_BASE,
@@ -57,7 +57,6 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       await AsyncStorage.removeItem("userToken");
-      console.log("Token expirado o no autorizado, redirigiendo al login");
     }
 
     return Promise.reject(error);

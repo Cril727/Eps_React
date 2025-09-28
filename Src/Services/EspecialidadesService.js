@@ -7,7 +7,6 @@ const EspecialidadesService = {
       const response = await api.get('api/Especialidades');
       return response.data;
     } catch (error) {
-      console.error('Error al obtener especialidades:', error);
       throw error;
     }
   },
@@ -18,7 +17,6 @@ const EspecialidadesService = {
       const response = await api.post('api/addEspecialidad', especialidadData);
       return response.data;
     } catch (error) {
-      console.error('Error al crear especialidad:', error);
       throw error;
     }
   },
@@ -29,7 +27,6 @@ const EspecialidadesService = {
       const response = await api.put(`api/updateEspecialidad/${id}`, especialidadData);
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar especialidad:', error);
       throw error;
     }
   },
@@ -40,7 +37,6 @@ const EspecialidadesService = {
       const response = await api.delete(`api/deleteEspecialidad/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al eliminar especialidad:', error);
       throw error;
     }
   },
@@ -51,7 +47,6 @@ const EspecialidadesService = {
       const response = await api.get(`api/especialidadById/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener especialidad:', error);
       throw error;
     }
   },

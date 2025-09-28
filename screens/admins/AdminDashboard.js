@@ -57,7 +57,6 @@ export default function AdminDashboard({ navigation }) {
         consultorios: consultoriosRes.consultorios?.length || 0,
       });
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
     } finally {
       setLoading(false);
     }
@@ -74,40 +73,40 @@ export default function AdminDashboard({ navigation }) {
       title: 'Especialidades',
       count: counts.especialidades,
       icon: 'star',
-      color: '#fde78dff', // Pastel yellow
-      iconColor: '#f59e0b', // Darker yellow for icon
+      color: '#fde78dff',
+      iconColor: '#f59e0b', 
       screen: 'Especialidades',
     },
     {
       title: 'Doctores',
       count: counts.doctores,
       icon: 'person',
-      color: '#a9f1ccff', // Pastel green
-      iconColor: '#10b981', // Darker green for icon
+      color: '#a9f1ccff', 
+      iconColor: '#10b981', 
       screen: 'Doctores',
     },
     {
       title: 'Pacientes',
       count: counts.pacientes,
       icon: 'people',
-      color: '#82b6fbff', // Pastel blue
-      iconColor: '#3b82f6', // Darker blue for icon
+      color: '#82b6fbff', 
+      iconColor: '#3b82f6', 
       screen: 'Pacientes',
     },
     {
       title: 'Citas',
       count: counts.citas,
       icon: 'calendar',
-      color: '#fabddfff', // Pastel pink/red
-      iconColor: '#ef4444', // Darker red for icon
+      color: '#fabddfff',
+      iconColor: '#ef4444', 
       screen: 'Citas',
     },
     {
       title: 'Consultorios',
       count: counts.consultorios,
       icon: 'business',
-      color: '#d3affaff', // Pastel purple
-      iconColor: '#8b5cf6', // Darker purple for icon
+      color: '#d3affaff', 
+      iconColor: '#8b5cf6',
       screen: 'Consultorios',
     },
   ];
@@ -220,7 +219,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   cardsGrid: {
-    // Changed to vertical list layout
   },
   statCard: {
     width: '100%',

@@ -68,7 +68,7 @@ export default function Usuarios() {
       email: '',
       telefono: '',
       password: '',
-      rol_id: 1, // Admin role by default (ID 1 in database as number)
+      rol_id: 1,
     });
     setModalVisible(true);
   };
@@ -124,7 +124,6 @@ export default function Usuarios() {
         rol_id: parseInt(formData.rol_id),
       };
 
-      // Only include password for new users or when explicitly set
       if (!editingUsuario && formData.password) {
         dataToSend.password = formData.password;
       } else if (editingUsuario && formData.password && formData.password.trim() !== '') {

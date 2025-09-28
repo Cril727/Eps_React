@@ -7,7 +7,6 @@ const UserService = {
       const response = await api.get('api/users');
       return response.data;
     } catch (error) {
-      console.error('Error al obtener usuarios:', error);
       throw error;
     }
   },
@@ -18,7 +17,6 @@ const UserService = {
       const response = await api.post('api/addUser', userData);
       return response.data;
     } catch (error) {
-      console.error('Error al crear usuario:', error);
       throw error;
     }
   },
@@ -29,7 +27,6 @@ const UserService = {
       const response = await api.put(`api/updateUser/${id}`, userData);
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar usuario:', error);
       throw error;
     }
   },
@@ -40,7 +37,6 @@ const UserService = {
       const response = await api.delete(`api/deleteUser/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al eliminar usuario:', error);
       throw error;
     }
   },
@@ -51,7 +47,6 @@ const UserService = {
       const response = await api.get(`api/userById/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener usuario:', error);
       throw error;
     }
   },
@@ -62,7 +57,6 @@ const UserService = {
       const response = await api.put(`api/actualizar-perfil-admin/${id}`, profileData);
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar perfil:', error);
       throw error;
     }
   },

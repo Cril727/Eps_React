@@ -7,7 +7,6 @@ const RolesService = {
       const response = await api.get('api/roles');
       return response.data;
     } catch (error) {
-      console.error('Error al obtener roles:', error);
       throw error;
     }
   },
@@ -18,7 +17,6 @@ const RolesService = {
       const response = await api.post('api/addRol', rolData);
       return response.data;
     } catch (error) {
-      console.error('Error al crear rol:', error);
       throw error;
     }
   },
@@ -29,7 +27,6 @@ const RolesService = {
       const response = await api.put(`api/updateRoles/${id}`, rolData);
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar rol:', error);
       throw error;
     }
   },
@@ -40,7 +37,6 @@ const RolesService = {
       const response = await api.delete(`api/deleteRol/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al eliminar rol:', error);
       throw error;
     }
   },
@@ -51,7 +47,6 @@ const RolesService = {
       const response = await api.get(`api/rolById/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener rol:', error);
       throw error;
     }
   },

@@ -1,7 +1,7 @@
 import api from './Conexion';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Helper function to get user role
+// Función auxiliar para obtener el rol del usuario
 const getUserRole = async () => {
   try {
     const userInfo = await AsyncStorage.getItem('userInfo');
@@ -11,7 +11,6 @@ const getUserRole = async () => {
     }
     return null;
   } catch (error) {
-    console.error('Error getting user role:', error);
     return null;
   }
 };
@@ -23,7 +22,6 @@ const DoctoresService = {
       const response = await api.get('api/doctores');
       return response.data;
     } catch (error) {
-      console.error('Error al obtener doctores:', error);
       throw error;
     }
   },
@@ -34,7 +32,6 @@ const DoctoresService = {
       const response = await api.post('api/addDoctor', doctorData);
       return response.data;
     } catch (error) {
-      console.error('Error al crear doctor:', error);
       throw error;
     }
   },
@@ -45,7 +42,6 @@ const DoctoresService = {
       const response = await api.put(`api/updateDoctor/${id}`, doctorData);
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar doctor:', error);
       throw error;
     }
   },
@@ -56,7 +52,6 @@ const DoctoresService = {
       const response = await api.delete(`api/deleteDoctor/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al eliminar doctor:', error);
       throw error;
     }
   },
@@ -67,7 +62,6 @@ const DoctoresService = {
       const response = await api.get(`api/DoctorById/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener doctor:', error);
       throw error;
     }
   },
@@ -80,7 +74,6 @@ const DoctoresService = {
       const response = await api.get(endpoint);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener mis citas:', error);
       throw error;
     }
   },
@@ -92,7 +85,6 @@ const DoctoresService = {
       const response = await api.get(endpoint);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener citas pendientes:', error);
       throw error;
     }
   },
@@ -104,7 +96,6 @@ const DoctoresService = {
       const response = await api.put(endpoint);
       return response.data;
     } catch (error) {
-      console.error('Error al aprobar cita:', error);
       throw error;
     }
   },
@@ -116,7 +107,17 @@ const DoctoresService = {
       const response = await api.put(endpoint);
       return response.data;
     } catch (error) {
-      console.error('Error al rechazar cita:', error);
+      throw error;
+    }
+  },
+
+  completarCita: async (id) => {
+    try {
+      const userRole = await getUserRole();
+      const endpoint = userRole === 'doctor' ? `api/doctor/completar-cita/${id}` : `api/completar-cita/${id}`;
+      const response = await api.put(endpoint);
+      return response.data;
+    } catch (error) {
       throw error;
     }
   },
@@ -126,7 +127,6 @@ const DoctoresService = {
       const response = await api.get('api/doctor/mis-horarios');
       return response.data;
     } catch (error) {
-      console.error('Error al obtener mis horarios:', error);
       throw error;
     }
   },
@@ -136,7 +136,6 @@ const DoctoresService = {
       const response = await api.get('api/doctor/mi-consultorio');
       return { consultorio: response.data.mi_consultorio };
     } catch (error) {
-      console.error('Error al obtener mi consultorio:', error);
       throw error;
     }
   },
@@ -146,7 +145,6 @@ const DoctoresService = {
       const response = await api.post('api/doctor/addHorario', horarioData);
       return response.data;
     } catch (error) {
-      console.error('Error al crear horario:', error);
       throw error;
     }
   },
@@ -156,7 +154,6 @@ const DoctoresService = {
       const response = await api.put(`api/doctor/updateHorario/${id}`, horarioData);
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar horario:', error);
       throw error;
     }
   },
@@ -166,7 +163,6 @@ const DoctoresService = {
       const response = await api.delete(`api/doctor/deleteHorario/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al eliminar horario:', error);
       throw error;
     }
   },

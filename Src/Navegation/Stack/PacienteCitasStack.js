@@ -1,0 +1,19 @@
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Citas from '../../../screens/pacientes/Citas';
+
+
+const Stack = createNativeStackNavigator();
+
+export function PacienteCitasStack() {
+  return (
+      <Stack.Navigator
+        screenOptions={{
+        headerStyle: { backgroundColor: '#0c82eaff' },
+        headerTintColor: '#fff',
+        headerTitleAlign: 'start',
+      }}>
+      <Stack.Screen name="Citas" component={Citas} />
+    </Stack.Navigator>
+  );
+}

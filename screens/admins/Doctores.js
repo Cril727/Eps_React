@@ -53,7 +53,6 @@ export default function Doctores() {
       const response = await EspecialidadesService.getEspecialidades();
       setEspecialidades(response.especialidad || []);
     } catch (error) {
-      console.error('Error al cargar especialidades:', error);
     }
   };
 

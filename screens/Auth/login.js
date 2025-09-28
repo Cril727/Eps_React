@@ -28,8 +28,6 @@ export default function Login({ navigation }) {
 
       if (result.success) {
         Alert.alert("Inicio de sesión", "¡Éxito!");
-        // No es necesario navegar aquí si tu AppNavigation conmutea por token.
-        // Si quisieras forzar navegación: navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
       } else {
         Alert.alert(
           "Error al iniciar sesión",
@@ -37,7 +35,6 @@ export default function Login({ navigation }) {
         );
       }
     } catch (e) {
-      console.log("Error inesperado en login: ", e);
       Alert.alert("Error", "Ocurrió un error al iniciar la sesión");
     } finally {
       setLoading(false);
@@ -79,7 +76,7 @@ export default function Login({ navigation }) {
         <TouchableOpacity
           style={[styles.button, loading && { opacity: 0.6 }]}
           onPress={handleLogin}
-          disabled={loading}             // <-- ahora correcto
+          disabled={loading}         
         >
           {loading ? (
             <ActivityIndicator />

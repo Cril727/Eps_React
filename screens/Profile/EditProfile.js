@@ -6,7 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  ActivityIndicator, // ✅ Import necesario
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TextInputComponent from '../../components/TextInputComponent';
@@ -88,7 +88,6 @@ export default function EditProfile({ navigation, route }) {
 
     setLoading(true);
     try {
-      // Get current user info
       const currentUserInfo = await getUserInfo();
 
       if (!currentUserInfo) {
@@ -96,7 +95,6 @@ export default function EditProfile({ navigation, route }) {
         return;
       }
 
-      // Update user info locally
       const updatedUserInfo = {
         ...currentUserInfo,
         nombres: formData.nombres,
@@ -107,20 +105,17 @@ export default function EditProfile({ navigation, route }) {
 
       // Save to AsyncStorage
       await AsyncStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
-
-      // Emit event to update other components
       DeviceEventEmitter.emit('tokenUpdated');
 
       Alert.alert('Éxito', 'Perfil actualizado correctamente');
 
-      // Pequeño delay para evitar warnings al navegar
+      //  delay para evitar warnings
       setTimeout(() => {
         if (isMountedRef.current) navigation.goBack();
       }, 100);
 
     } catch (error) {
       if (isMountedRef.current) {
-        console.log('Error al actualizar perfil localmente:', error);
         Alert.alert('Error', 'Error al actualizar el perfil');
       }
     } finally {
@@ -128,7 +123,7 @@ export default function EditProfile({ navigation, route }) {
     }
   };
 
-  // ✅ Fallback seguro para el rol
+  //Fallback seguro para el rol
   const roleLabelRaw = (userRole ?? 'usuario') + '';
   const roleLabel =
     roleLabelRaw.charAt(0).toUpperCase() + roleLabelRaw.slice(1);

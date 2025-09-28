@@ -65,7 +65,6 @@ export default function AdminCitas() {
       const response = await PacientesService.getPacientes();
       setPacientes(response.pacientes || []);
     } catch (error) {
-      console.error('Error al cargar pacientes:', error);
     }
   };
 
@@ -74,7 +73,6 @@ export default function AdminCitas() {
       const response = await DoctoresService.getDoctores();
       setDoctores(response.doctores || []);
     } catch (error) {
-      console.error('Error al cargar doctores:', error);
     }
   };
 
@@ -83,7 +81,6 @@ export default function AdminCitas() {
       const response = await ConsultoriosService.getConsultorios();
       setConsultorios(response.consultorios || []);
     } catch (error) {
-      console.error('Error al cargar consultorios:', error);
     }
   };
 
@@ -188,7 +185,7 @@ export default function AdminCitas() {
     try {
       const dataToSend = {
         ...formData,
-        novedad: formData.novedad || 'Cita creada por administrador', // Default value if empty
+        novedad: formData.novedad || 'Cita creada por administrador',
         paciente_id: parseInt(formData.paciente_id),
         doctor_id: parseInt(formData.doctor_id),
         consultorio_id: parseInt(formData.consultorio_id),

@@ -13,7 +13,6 @@ export default function Home({ navigation }) {
         const userInfo = await getUserInfo();
         setUserRole(userInfo?.role);
       } catch (error) {
-        console.error('Error loading user role:', error);
       } finally {
         setLoading(false);
       }
@@ -24,13 +23,13 @@ export default function Home({ navigation }) {
   const getMenuItems = () => {
     if (userRole === 'doctor') {
       return [
-        { title: 'Mis Citas', subtitle: 'Ver y gestionar citas', icon: 'calendar', screen: 'MisCitas', color: '#0c82ea' },
-        { title: 'Mi Perfil', subtitle: 'Ver y editar información', icon: 'person', screen: 'Perfil', color: '#6c757d' },
+        { title: 'Mis Citas', subtitle: 'Ver y gestionar citas', icon: 'calendar', screen: 'MisCitas', color: '#00796b' },
+        { title: 'Mi Perfil', subtitle: 'Ver y editar información', icon: 'person', screen: 'Perfil', color: '#455a64' },
       ];
     }
     return [
-      { title: 'Mis Citas', subtitle: 'Ver y gestionar citas', icon: 'calendar', screen: 'MisCitas', color: '#0c82ea' },
-      { title: 'Mi Perfil', subtitle: 'Ver y editar información', icon: 'person', screen: 'Perfil', color: '#28a745' },
+      { title: 'Mis Citas', subtitle: 'Ver y gestionar citas', icon: 'calendar', screen: 'MisCitas', color: '#1976d2' },
+      { title: 'Mi Perfil', subtitle: 'Ver y editar información', icon: 'person', screen: 'Perfil', color: '#388e3c' },
     ];
   };
 
@@ -80,12 +79,13 @@ export default function Home({ navigation }) {
         </>
       }
       ListFooterComponent={
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoTitle}>Información Importante</Text>
-          <Text style={styles.infoText}>
-            • Recuerda confirmar tus citas con anticipación{'\n'}
-            • Puedes reprogramar citas desde la sección "Mis Citas"{'\n'}
-            • Mantén tu perfil actualizado para una mejor atención
+        <View style={styles.tipsContainer}>
+          <Ionicons name="medkit" size={32} color="#d32f2f" style={{ marginBottom: 10 }} />
+          <Text style={styles.tipsTitle}>Tips de Salud</Text>
+          <Text style={styles.tipsText}>
+            • Mantente hidratado durante el día{'\n'}
+            • Realiza al menos 30 minutos de ejercicio diario{'\n'}
+            • No olvides tus chequeos médicos periódicos
           </Text>
         </View>
       }
@@ -94,9 +94,9 @@ export default function Home({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: '#fafafa' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { backgroundColor: '#0c82ea', padding: 20, paddingTop: 40, alignItems: 'center' },
+  header: { backgroundColor: '#1976d2', padding: 20, paddingTop: 40, alignItems: 'center' },
   title: { fontSize: 24, fontWeight: 'bold', color: 'white', marginBottom: 5 },
   subtitle: { fontSize: 16, color: '#e3f2fd' },
   menuContainer: { paddingHorizontal: 20, paddingTop: 20 },
@@ -109,10 +109,11 @@ const styles = StyleSheet.create({
   menuText: { marginLeft: 15, flex: 1 },
   menuTitle: { fontSize: 18, fontWeight: '600', color: '#333', marginBottom: 2 },
   menuSubtitle: { fontSize: 14, color: '#666' },
-  infoContainer: {
-    backgroundColor: 'white', margin: 20, padding: 20, borderRadius: 10,
+  tipsContainer: {
+    backgroundColor: '#fff3f3', margin: 20, padding: 20, borderRadius: 10,
     shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3,
+    alignItems: 'center'
   },
-  infoTitle: { fontSize: 18, fontWeight: '600', color: '#333', marginBottom: 10 },
-  infoText: { fontSize: 14, color: '#666', lineHeight: 20 },
+  tipsTitle: { fontSize: 18, fontWeight: '700', color: '#d32f2f', marginBottom: 10 },
+  tipsText: { fontSize: 14, color: '#444', lineHeight: 20, textAlign: 'center' },
 });

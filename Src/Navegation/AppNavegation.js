@@ -21,30 +21,24 @@ export default function AppNavegation() {
     try {
       const token = await AsyncStorage.getItem('userToken')
       const userInfo = await getUserInfo();
-      
+
       setUserToken(token)
       setUserRole(userInfo?.role || null);
-      
-      console.log("Token cargado:", !!token);
-      console.log("Rol del usuario:", userInfo?.role);
+
     } catch (error) {
-      console.log("Error al cargar el token desde AsyncStorage", error)
     }finally{
       setIsLoading(false)
     }
   };
 
-
-  //Se ejecuta cuando el componente se monta 
   useEffect(()=>{
     loadToken();
   },[])
 
-  //Se ejecuta cuando hay cambio de estado en la app  (inactivo, activo, background)
+
   useEffect(() =>{
     const handleAppChange = (nextAppState) =>{
       if(appState.current.match(/inactive|background/) && nextAppState === 'active'){
-        console.log("La aplicacion ha vuelto al primer plano, verificando el token")
         loadToken();
       }
       appState.current = nextAppState;
@@ -55,7 +49,6 @@ export default function AppNavegation() {
   },[])
 
 
-  //Se ejecuta en un intervalo de 2 segundos
   useEffect(()=>{
     const interval = setInterval(()=>{
       if(AppState.currentState === 'active'){
@@ -65,7 +58,6 @@ export default function AppNavegation() {
     return () => clearInterval(interval)
   },[]);
 
-  //Escucha el evento de actualización de token
   useEffect(() => {
     const subscription = DeviceEventEmitter.addListener('tokenUpdated', loadToken);
     return () => subscription.remove();
@@ -79,17 +71,13 @@ export default function AppNavegation() {
     // Redirigir según el rol del usuario
     switch (userRole) {
       case 'admin':
-        console.log("Navegando a AdminNavigation");
         return <AdminNavigation />;
       case 'doctor':
-        console.log("Navegando a DoctorNavigation");
         return <DoctorNavigation />;
       case 'paciente':
-        console.log("Navegando a PacienteNavigation");
         return <PacienteNavigation />;
       default:
-        console.log("Rol no reconocido, usando navegación por defecto");
-        return <PacienteNavigation />; // Por defecto, usar navegación de paciente
+        return <PacienteNavigation />;
     }
   };
 

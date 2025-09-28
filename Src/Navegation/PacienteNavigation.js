@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import MainStack from './Stack/MainStack';
-import { CitasStack } from './Stack/CitasStack';
+import { PacienteCitasStack } from './Stack/PacienteCitasStack';
 import { EspecialidadesStack } from './Stack/EspecialidadStack';
 import { DoctoresStack } from './Stack/DoctoresStack';
 import { ProfileStack } from './Stack/ProfileStack';
@@ -39,7 +39,7 @@ export default function PacienteNavigation() {
 
       <Tab.Screen
         name="MisCitas"
-        component={CitasStack}
+        component={PacienteCitasStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-number" size={size} color={color} />

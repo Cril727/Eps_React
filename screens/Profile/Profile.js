@@ -33,7 +33,6 @@ export default function Profile({ navigation }) {
     const userInfo = await getUserInfo();
     if (userInfo && userInfo.role) {
       setUserRole(userInfo.role);
-      // Use stored user info for all roles to avoid API calls that could log out users
       setUserProfile(userInfo);
       setLoading(false);
     } else {
@@ -44,8 +43,6 @@ export default function Profile({ navigation }) {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // Since we're now using local storage for all roles, no API call needed on refresh
-    // The profile data is already loaded from local storage
     setRefreshing(false);
   };
 
@@ -64,7 +61,6 @@ export default function Profile({ navigation }) {
           onPress: async () => {
             const result = await logout();
             if (result.success) {
-              // Navigation will be handled by the auth state change
             } else {
               Alert.alert('Error', result.message);
             }

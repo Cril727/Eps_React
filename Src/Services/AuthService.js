@@ -5,13 +5,8 @@ import api from "./Conexion";
 export const registerUser = async (name, email, password, rol) => {
     try {
         const response = await api.post("api/addUser", { name, email, password, rol });
-        console.log("Respuesta del registro", response.data);
         return { success: true, message: response.data.message, user: response.data.user };
     } catch (e) {
-        console.log(
-            "Error al registrar usuario",
-            e.response ? e.response.data : e.message,
-        );
         return {
             success: false,
             message: e.response ? e.response.data : "Error de conexión",
@@ -28,13 +23,8 @@ export const registerPatient = async (nombres, apellidos, email, telefono, passw
             telefono,
             password
         });
-        console.log("Respuesta del registro de paciente", response.data);
         return { success: true, message: response.data.message, paciente: response.data.paciente };
     } catch (e) {
-        console.log(
-            "Error al registrar paciente",
-            e.response ? e.response.data : e.message,
-        );
         return {
             success: false,
             message: e.response?.data?.message || "Error de conexión",
@@ -46,7 +36,6 @@ export const registerPatient = async (nombres, apellidos, email, telefono, passw
 export const loginUser = async (email, password) => {
     try {
         const response = await api.post("api/login", { email, password });
-        console.log("Respuesta del servidor", response.data);
         
         const { access_token, guard, user } = response.data;
         
@@ -55,7 +44,7 @@ export const loginUser = async (email, password) => {
             await AsyncStorage.setItem("userToken", access_token);
             
             // Determinar el rol basado en el guard o la relación rol del usuario
-            let userRole = 'paciente'; // default
+            let userRole = 'paciente'; // por defecto
             
             // Primero intentar obtener el rol de la relación user.rol
             if (user.rol && user.rol.rol) {
@@ -78,7 +67,6 @@ export const loginUser = async (email, password) => {
                 guard: guard
             }));
             
-            console.log("Login exitoso - Rol:", userRole, "Guard:", guard);
             
             DeviceEventEmitter.emit('tokenUpdated');
             return {
@@ -92,11 +80,6 @@ export const loginUser = async (email, password) => {
         return { success: false, message: "Respuesta sin token o usuario" };
 
     } catch (e) {
-        console.log(
-            "Error al iniciar sesion",
-            e.response ? e.response.data : e.message,
-        );
-
         return {
             success: false,
             message: e.response?.data?.message || "Error de conexión",
@@ -109,14 +92,13 @@ export const getUserInfo = async () => {
         const userInfo = await AsyncStorage.getItem("userInfo");
         return userInfo ? JSON.parse(userInfo) : null;
     } catch (error) {
-        console.log("Error al obtener información del usuario:", error);
         return null;
     }
 };
 
 export const logout = async () => {
     try {
-        // Call backend logout endpoint to invalidate token
+        // Llamar al endpoint de logout del backend para invalidar el token
         const token = await AsyncStorage.getItem("userToken");
         if (token) {
             try {
@@ -126,18 +108,16 @@ export const logout = async () => {
                     }
                 });
             } catch (backendError) {
-                console.log("Error al cerrar sesión en el backend:", backendError);
                 // Continue with local logout even if backend fails
             }
         }
         
-        // Remove local storage
+        // Remover almacenamiento local
         await AsyncStorage.removeItem("userToken");
         await AsyncStorage.removeItem("userInfo");
         DeviceEventEmitter.emit('tokenUpdated');
         return { success: true };
     } catch (error) {
-        console.log("Error al cerrar sesión:", error);
         return { success: false, message: "Error al cerrar sesión" };
     }
 };
@@ -160,7 +140,6 @@ export const getUserProfile = async () => {
             user: response.data.user
         };
     } catch (error) {
-        console.log("Error al obtener perfil:", error);
         return {
             success: false,
             message: error.response?.data?.message || "Error al obtener perfil"
@@ -181,7 +160,7 @@ export const updateUserProfile = async (profileData) => {
             }
         });
 
-        // Update local storage with new user data
+        // Actualizar almacenamiento local con nuevos datos del usuario
         if (response.data.user) {
             const currentUserInfo = await getUserInfo();
             const updatedUserInfo = {
@@ -197,7 +176,6 @@ export const updateUserProfile = async (profileData) => {
             user: response.data.user
         };
     } catch (error) {
-        console.log("Error al actualizar perfil:", error);
         return {
             success: false,
             message: error.response?.data?.message || "Error al actualizar perfil",

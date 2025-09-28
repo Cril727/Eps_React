@@ -40,7 +40,6 @@ export default function Citas() {
           await loadMisCitasDoctor();
           await loadCitasPendientesDoctor();
         } catch (error) {
-          console.error('Error loading doctor appointments:', error);
         } finally {
           setLoading(false);
         }
@@ -59,7 +58,6 @@ export default function Citas() {
       const response = await PacientesService.getMisCitas();
       setCitas(response.citas || []);
     } catch (error) {
-      console.error('Error al cargar citas:', error);
     }
   };
 
@@ -68,7 +66,6 @@ export default function Citas() {
       const response = await DoctoresService.getMisCitas();
       setCitas(response.citas || []);
     } catch (error) {
-      console.error('Error al cargar citas del doctor:', error);
     }
   };
 
@@ -77,7 +74,6 @@ export default function Citas() {
       const response = await DoctoresService.getMisCitasPendientes();
       setCitasPendientes(response.citas_pendientes || []);
     } catch (error) {
-      console.error('Error al cargar citas pendientes:', error);
     }
   };
 
@@ -86,7 +82,6 @@ export default function Citas() {
       const response = await PacientesService.getDoctoresDisponibles();
       setDoctores(response.doctores_disponibles || []);
     } catch (error) {
-      console.error('Error al cargar doctores:', error);
     }
   };
 
@@ -95,7 +90,6 @@ export default function Citas() {
       const response = await PacientesService.getHorariosDisponibles(doctorId);
       setHorarios(response.horarios_disponibles || []);
     } catch (error) {
-      console.error('Error al cargar horarios:', error);
       Alert.alert('Error', 'No se pudieron cargar los horarios disponibles');
     }
   };
@@ -105,7 +99,6 @@ export default function Citas() {
       const response = await PacientesService.getConsultoriosDisponibles(doctorId);
       setConsultorios(response.consultorios_disponibles || []);
     } catch (error) {
-      console.error('Error al cargar consultorios:', error);
       Alert.alert('Error', 'No se pudieron cargar los consultorios disponibles');
     }
   };
@@ -170,7 +163,6 @@ export default function Citas() {
     }
 
     if (!fechaHoraISO && horaInicio) {
-      // Último recurso: hoy + horaInicio
       const now = new Date();
       const [hh, mm] = String(horaInicio).split(':').map(Number);
       const dt = new Date(
@@ -247,6 +239,30 @@ export default function Citas() {
     );
   };
 
+  const handleCompletarCita = async (citaId) => {
+    Alert.alert(
+      'Confirmar completado',
+      '¿Estás seguro de que quieres marcar esta cita como completada?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Completar',
+          style: 'default',
+          onPress: async () => {
+            try {
+              await DoctoresService.completarCita(citaId);
+              Alert.alert('Éxito', 'Cita completada correctamente');
+              loadMisCitasDoctor();
+              loadCitasPendientesDoctor();
+            } catch {
+              Alert.alert('Error', 'No se pudo completar la cita');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const getStatusColor = (estado) => {
     switch (estado) {
       case 'Programada':
@@ -255,8 +271,10 @@ export default function Citas() {
         return '#28a745';
       case 'Rechazada':
         return '#dc3545';
-      default:
+      case 'Por aprobar':
         return '#6c757d';
+      default:
+        return '#092c4bff';
     }
   };
 
@@ -304,7 +322,7 @@ export default function Citas() {
 
       {!!item.novedad && <Text style={styles.novedadText}>Nota: {item.novedad}</Text>}
 
-      {userRole === 'doctor' && item.estado === 'Programada' && (
+      {userRole === 'doctor' && item.estado === 'Por aprobar' && (
         <View style={styles.doctorActions}>
           <TouchableOpacity
             style={[styles.doctorActionButton, styles.approveButton]}
@@ -319,6 +337,18 @@ export default function Citas() {
           >
             <Ionicons name="close" size={16} color="white" />
             <Text style={styles.doctorActionText}>Rechazar</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {userRole === 'doctor' && item.estado === 'Programada' && (
+        <View style={styles.doctorActions}>
+          <TouchableOpacity
+            style={[styles.doctorActionButton, styles.completeButton]}
+            onPress={() => handleCompletarCita(item.id)}
+          >
+            <Ionicons name="checkmark-done" size={16} color="white" />
+            <Text style={styles.doctorActionText}>Completar</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -689,5 +719,6 @@ const styles = StyleSheet.create({
   },
   approveButton: { backgroundColor: '#28a745' },
   rejectButton: { backgroundColor: '#dc3545' },
+  completeButton: { backgroundColor: '#007bff' },
   doctorActionText: { color: 'white', fontWeight: 'bold', marginLeft: 5 },
 });

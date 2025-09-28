@@ -14,13 +14,12 @@ export default function MainStack() {
   // console.log(userInfo);
 
   React.useEffect(() => {
-    
+
     const loadUserRole = async () => {
       try {
         const userInfo = await getUserInfo();
         setUserRole(userInfo?.role);
       } catch (error) {
-        console.error('Error loading user role:', error);
       } finally {
         setLoading(false);
       }

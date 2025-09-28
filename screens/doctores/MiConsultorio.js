@@ -36,9 +36,8 @@ export default function MiConsultorio() {
       setConsultorio(response.consultorio);
     } catch (error) {
       if (error.response?.status === 404) {
-        setConsultorio(null); // No consultorio assigned
+        setConsultorio(null); // No consultorio
       } else {
-        console.error('Error al cargar mi consultorio:', error);
         Alert.alert('Error', 'No se pudo cargar la información del consultorio');
       }
     } finally {
