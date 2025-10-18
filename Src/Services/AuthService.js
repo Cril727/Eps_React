@@ -87,6 +87,25 @@ export const loginUser = async (email, password) => {
     }
 };
 
+export const resetPassword = async (email) => {
+    try {
+        console.log("🔗 Enviando request a api/reset-password con email:", email);
+        const response = await api.post("api/reset-password", { email });
+        console.log("📨 Respuesta completa del servidor:", response);
+        console.log("📨 Datos de respuesta:", response.data);
+        return { success: true, message: response.data.message };
+    } catch (e) {
+        console.log("❌ Error en resetPassword:", e);
+        console.log("❌ Error response:", e.response);
+        console.log("❌ Error response data:", e.response?.data);
+        return {
+            success: false,
+            message: e.response?.data?.message || "Error de conexión",
+            errors: e.response?.data?.errors
+        };
+    }
+};
+
 export const getUserInfo = async () => {
     try {
         const userInfo = await AsyncStorage.getItem("userInfo");

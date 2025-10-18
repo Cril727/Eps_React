@@ -67,7 +67,7 @@ export default function Login({ navigation }) {
         />
 
         <TouchableOpacity
-          onPress={() => Alert.alert("Recuperar", "Función no implementada")}
+          onPress={() => navigation.navigate("ForgotPassword")}
           disabled={loading}
         >
           <Text style={styles.forgotPassword}>¿Olvidaste tu contraseña?</Text>

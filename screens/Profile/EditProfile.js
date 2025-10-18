@@ -177,27 +177,6 @@ export default function EditProfile({ navigation, route }) {
           <Text style={styles.roleValue}>{roleLabel}</Text>
         </View>
 
-        <View style={styles.passwordSection}>
-          <Text style={styles.sectionTitle}>Cambiar Contraseña (Opcional)</Text>
-
-          <TextInputComponent
-            placeholder="Nueva contraseña"
-            value={formData.password}
-            onChangeText={(value) => handleInputChange('password', value)}
-            error={errors.password}
-            leftIcon="lock-closed"
-            secureTextEntry
-          />
-
-          <TextInputComponent
-            placeholder="Confirmar nueva contraseña"
-            value={formData.confirmPassword}
-            onChangeText={(value) => handleInputChange('confirmPassword', value)}
-            error={errors.confirmPassword}
-            leftIcon="lock-closed"
-            secureTextEntry
-          />
-        </View>
 
         <TouchableOpacity
           style={[styles.saveButton, loading && styles.saveButtonDisabled]}

@@ -65,8 +65,8 @@ export default function Horarios() {
   const handleEdit = (horario) => {
     setEditingHorario(horario);
     setFormData({
-      horaInicio: horario.horaInicio,
-      horaFin: horario.horaFin,
+      horaInicio: horario.horaInicio.substring(0, 5), // Remove seconds for form
+      horaFin: horario.horaFin.substring(0, 5), // Remove seconds for form
       estado: horario.estado,
     });
     setModalVisible(true);
@@ -75,7 +75,7 @@ export default function Horarios() {
   const handleDelete = (horario) => {
     Alert.alert(
       'Confirmar eliminación',
-      `¿Estás seguro de que quieres eliminar este horario (${horario.horaInicio} - ${horario.horaFin})?`,
+      `¿Estás seguro de que quieres eliminar este horario (${horario.horaInicio.substring(0, 5)} - ${horario.horaFin.substring(0, 5)})?`,
       [
         { text: 'Cancelar', style: 'cancel' },
         {
@@ -96,13 +96,17 @@ export default function Horarios() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.horaInicio || !formData.horaFin) {
-      Alert.alert('Error', 'Por favor completa las horas de inicio y fin');
+    if (!formData.horaInicio || !formData.horaFin || !formData.estado) {
+      Alert.alert('Error', 'Por favor completa todos los campos');
       return;
     }
 
     try {
-      const dataToSend = formData;
+      const dataToSend = {
+        ...formData,
+        horaInicio: formData.horaInicio + ':00', // Add seconds for backend
+        horaFin: formData.horaFin + ':00', // Add seconds for backend
+      };
 
       if (editingHorario) {
         await DoctoresService.updateHorario(editingHorario.id, dataToSend);
@@ -122,7 +126,7 @@ export default function Horarios() {
     <View style={styles.horarioCard}>
       <View style={styles.horarioInfo}>
         <Text style={styles.horarioTime}>
-          {item.horaInicio} - {item.horaFin}
+          {item.horaInicio.substring(0, 5)} - {item.horaFin.substring(0, 5)}
         </Text>
         <View style={[styles.statusBadge, item.estado === 'Activo' ? styles.activeBadge : styles.inactiveBadge]}>
           <Text style={styles.statusText}>{item.estado}</Text>

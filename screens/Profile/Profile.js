@@ -135,6 +135,11 @@ export default function Profile({ navigation }) {
           <Text style={styles.editButtonText}>Editar Perfil</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate('Configuracion')}>
+          <Ionicons name="settings" size={20} color="#fff" />
+          <Text style={styles.settingsButtonText}>Configuración</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Ionicons name="log-out" size={20} color="#fff" />
           <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
@@ -216,6 +221,21 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   editButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 10,
+  },
+  settingsButton: {
+    backgroundColor: '#28a745',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  settingsButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
