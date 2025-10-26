@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DeviceEventEmitter } from 'react-native';
 import api from "./Conexion";
+import NotificationService from './NotificationService';
 
 export const registerUser = async (name, email, password, rol) => {
     try {
@@ -67,6 +68,16 @@ export const loginUser = async (email, password) => {
                 guard: guard
             }));
             
+            // Registrar el token de notificaciones push
+            try {
+                const pushToken = await NotificationService.getExpoPushToken();
+                if (pushToken) {
+                    await updatePushToken(pushToken);
+                }
+            } catch (pushError) {
+                console.log('Error registering push token:', pushError);
+                // No fallar el login si falla el registro del push token
+            }
             
             DeviceEventEmitter.emit('tokenUpdated');
             return {
@@ -199,6 +210,36 @@ export const updateUserProfile = async (profileData) => {
             success: false,
             message: error.response?.data?.message || "Error al actualizar perfil",
             errors: error.response?.data?.errors
+        };
+    }
+};
+
+export const updatePushToken = async (expoPushToken) => {
+    try {
+        const token = await AsyncStorage.getItem("userToken");
+        if (!token) {
+            return { success: false, message: "No hay token de autenticación" };
+        }
+
+        const response = await api.post("api/update-push-token",
+            { expo_push_token: expoPushToken },
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        console.log('✅ Push token actualizado en el servidor');
+        return {
+            success: true,
+            message: response.data.message
+        };
+    } catch (error) {
+        console.error('❌ Error al actualizar push token:', error);
+        return {
+            success: false,
+            message: error.response?.data?.message || "Error al actualizar token de notificaciones"
         };
     }
 };

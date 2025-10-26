@@ -157,15 +157,36 @@ export default function ConfiguracionScreen(){
                 confirmPassword: ''
             });
         } catch (error) {
+            console.log('❌ Error data:', error.response?.data);
+            
             if (error.response?.data?.errors) {
                 // Handle field-specific errors from backend
                 const fieldErrors = {};
-                Object.keys(error.response.data.errors).forEach(key => {
-                    fieldErrors[key] = error.response.data.errors[key][0]; // Take first error message
+                const backendErrors = error.response.data.errors;
+                
+                // Map backend field names to frontend field names
+                Object.keys(backendErrors).forEach(key => {
+                    const errorMessage = backendErrors[key][0]; // Take first error message
+                    
+                    // Map backend field names to frontend field names
+                    if (key === 'current_password') {
+                        fieldErrors.currentPassword = errorMessage;
+                    } else if (key === 'password') {
+                        fieldErrors.newPassword = errorMessage;
+                    } else if (key === 'password_confirmation') {
+                        fieldErrors.confirmPassword = errorMessage;
+                    } else {
+                        fieldErrors[key] = errorMessage;
+                    }
                 });
+                
                 setPasswordErrors(fieldErrors);
+                
+                // Show alert with the main error message
+                const mainError = error.response.data.message || 'Error al cambiar la contraseña';
+                Alert.alert('❌ Error', mainError);
             } else {
-                Alert.alert('Error', error.response?.data?.message || 'Error al cambiar la contraseña');
+                Alert.alert('❌ Error', error.response?.data?.message || 'Error al cambiar la contraseña');
             }
         } finally {
             setChangingPassword(false);

@@ -16,6 +16,7 @@ import PacientesService from '../../Src/Services/PacientesService';
 import DoctoresService from '../../Src/Services/DoctoresService';
 import { getUserInfo } from '../../Src/Services/AuthService';
 import { AppointmentCard, SelectionCard, LoadingSpinner, EmptyState, Header } from '../../components';
+import NotificationService from '../../Src/Services/NotificationService';
 
 // --- Helpers ---
 const pad = (n) => (n < 10 ? `0${n}` : `${n}`);
@@ -185,8 +186,15 @@ export default function Citas() {
     };
 
     try {
-      await PacientesService.solicitarCita(citaData);
-      Alert.alert('Éxito', 'Cita solicitada correctamente');
+      const response = await PacientesService.solicitarCita(citaData);
+      
+      // Show immediate notification
+      await NotificationService.showNotification(
+        '✅ Cita Solicitada',
+        `Tu solicitud de cita con Dr. ${selectedDoctor.nombres} ${selectedDoctor.apellidos} ha sido enviada y está pendiente de aprobación.`
+      );
+      
+      Alert.alert('Éxito', 'Cita solicitada correctamente. Recibirás una notificación cuando sea aprobada.');
       setModalVisible(false);
       loadMisCitas();
     } catch (error) {
@@ -196,11 +204,32 @@ export default function Citas() {
 
   const handleAprobarCita = async (citaId) => {
     try {
-      await DoctoresService.aprobarCita(citaId);
-      Alert.alert('Éxito', 'Cita aprobada correctamente');
+      const response = await DoctoresService.aprobarCita(citaId);
+      
+      // Get the approved appointment details
+      const citaAprobada = citasPendientes.find(c => c.id === citaId);
+      
+      if (citaAprobada) {
+        // Schedule reminder notification for 1 hour before appointment
+        await NotificationService.scheduleAppointmentReminder({
+          id: citaAprobada.id,
+          fechaHora: citaAprobada.fechaHora,
+          doctor: citaAprobada.doctor,
+          consultorio: citaAprobada.consultorio,
+        });
+        
+        // Show immediate notification
+        await NotificationService.showNotification(
+          '✅ Cita Aprobada',
+          `La cita ha sido aprobada. Se ha programado un recordatorio.`
+        );
+      }
+      
+      Alert.alert('Éxito', 'Cita aprobada correctamente. Se ha enviado una notificación al paciente.');
       loadMisCitasDoctor();
       loadCitasPendientesDoctor();
-    } catch {
+    } catch (error) {
+      console.error('Error aprobando cita:', error);
       Alert.alert('Error', 'No se pudo aprobar la cita');
     }
   };
@@ -214,6 +243,13 @@ export default function Citas() {
         onPress: async () => {
           try {
             await DoctoresService.rechazarCita(citaId);
+            
+            // Show notification about rejection
+            await NotificationService.showNotification(
+              '❌ Cita Rechazada',
+              'La cita ha sido rechazada. Se ha notificado al paciente.'
+            );
+            
             Alert.alert('Éxito', 'Cita rechazada correctamente');
             loadMisCitasDoctor();
             loadCitasPendientesDoctor();
