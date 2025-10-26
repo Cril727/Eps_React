@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Alert, Switch, Text, View, Button, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Alert, Switch, Text, View, Button, ScrollView, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native";
 import * as Notificaciones from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
@@ -50,6 +50,24 @@ export default function ConfiguracionScreen(){
             await AsyncStorage.setItem('notificaciones_activas','false')
             setPermisoNotificaciones(false);
             Alert.alert("Notificaciones desactivadas");
+
+            // Send notification to remind user to enable notifications
+            // First check if we have permission to schedule notifications
+            const { status } = await Notificaciones.getPermissionsAsync();
+            if (status === 'granted') {
+                const trigger = { type: 'date', date: new Date(Date.now() + 10 * 1000) }; // 10 segundos desde ahora
+                try {
+                    await Notificaciones.scheduleNotificationAsync({
+                        content: {
+                            title: "¡Activa las notificaciones!",
+                            body: "Mantente al día con todas las actualizaciones de tus consultas médicas."
+                        },
+                        trigger
+                    });
+                } catch (error) {
+                    console.log("Error scheduling reminder notification:", error);
+                }
+            }
         }
     }
 
@@ -114,6 +132,24 @@ export default function ConfiguracionScreen(){
             });
 
             Alert.alert('Éxito', 'Contraseña cambiada exitosamente');
+
+            // Send success notification after 5 seconds
+            const { status } = await Notificaciones.getPermissionsAsync();
+            if (status === 'granted') {
+                const trigger = { type: 'date', date: new Date(Date.now() + 5 * 1000) }; // 5 seconds from now
+                try {
+                    await Notificaciones.scheduleNotificationAsync({
+                        content: {
+                            title: "¡Contraseña cambiada!",
+                            body: "El cambio de contraseña ha sido exitoso. Tu cuenta está segura."
+                        },
+                        trigger
+                    });
+                } catch (error) {
+                    console.log("Error scheduling success notification:", error);
+                }
+            }
+
             // Clear form
             setPasswordForm({
                 currentPassword: '',
@@ -162,8 +198,9 @@ export default function ConfiguracionScreen(){
     }
 
     return(
-        <ScrollView style={{flex:1, backgroundColor: '#f5f5f5'}}>
-            <View style={{padding: 20}}>
+        <KeyboardAvoidingView style={{flex:1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <ScrollView style={{flex:1, backgroundColor: '#f5f5f5'}} contentContainerStyle={{paddingBottom: 100}}>
+                <View style={{padding: 20}}>
                 {/* Header */}
                 <View style={{alignItems: 'center', marginBottom: 30}}>
                     <Ionicons name="settings" size={60} color="#0c82eaff" />
@@ -195,21 +232,6 @@ export default function ConfiguracionScreen(){
                         <Switch value={permisoNotificaciones} onValueChange={toggleSwitch}/>
                     </View>
 
-                    <TouchableOpacity
-                        style={{
-                            backgroundColor: '#28a745',
-                            paddingVertical: 12,
-                            paddingHorizontal: 20,
-                            borderRadius: 8,
-                            marginTop: 15,
-                            alignItems: 'center'
-                        }}
-                        onPress={programarNotificacion}
-                    >
-                        <Text style={{color: '#fff', fontSize: 16, fontWeight: '600'}}>
-                            Probar Notificación
-                        </Text>
-                    </TouchableOpacity>
                 </View>
 
                 {/* Change Password Section */}
@@ -282,5 +304,6 @@ export default function ConfiguracionScreen(){
                 </View>
             </View>
         </ScrollView>
+        </KeyboardAvoidingView>
     )
 }

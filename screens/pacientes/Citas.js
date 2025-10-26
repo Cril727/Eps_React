@@ -98,7 +98,7 @@ export default function Citas() {
   const loadHorariosDisponibles = async (doctorId, fechaStr) => {
     try {
       const response = await PacientesService.getHorariosDisponibles(doctorId, fechaStr);
-      setHorarios(response.horarios_disponibles || []);
+      setHorarios(Object.values(response.horarios_disponibles || {}));
     } catch (error) {
       Alert.alert('Error', 'No se pudieron cargar los horarios disponibles');
     }
@@ -423,7 +423,7 @@ export default function Citas() {
                           isSelected={selectedConsultorio?.id === item.id}
                           onPress={handleConsultorioSelect}
                           title={`${item.codigo} - ${item.ubicacion}`}
-                          subtitle={`Estado: ${item.estado}`}
+                          subtitle={`Ubicación: ${item.ubicacion}`}
                           showEstado={false}
                         />
                       ))
