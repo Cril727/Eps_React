@@ -9,6 +9,7 @@ import {
   Modal,
   ScrollView,
   TextInput,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import PacientesService from '../../Src/Services/PacientesService';
@@ -22,6 +23,7 @@ export default function Citas() {
   const [doctores, setDoctores] = useState([]);
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedHorario, setSelectedHorario] = useState(null);
@@ -52,6 +54,21 @@ export default function Citas() {
 
     initializeScreen();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      if (userRole === 'doctor') {
+        await Promise.all([loadMisCitasDoctor(), loadCitasPendientesDoctor()]);
+      } else {
+        await Promise.all([loadMisCitas(), loadDoctoresDisponibles()]);
+      }
+    } catch (error) {
+      console.error('Error refreshing:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const loadMisCitas = async () => {
     try {
@@ -398,6 +415,14 @@ export default function Citas() {
         renderItem={renderCita}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#0c82ea']}
+            tintColor="#0c82ea"
+          />
+        }
         ListEmptyComponent={
           <View style={styles.center}>
             <Text>

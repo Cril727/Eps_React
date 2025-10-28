@@ -50,6 +50,7 @@ export default function Login({ navigation }) {
         <TextInput
           style={styles.input}
           placeholder="Correo electrónico"
+          placeholderTextColor="#9CA3AF"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -60,6 +61,7 @@ export default function Login({ navigation }) {
         <TextInput
           style={styles.input}
           placeholder="Contraseña"
+          placeholderTextColor="#9CA3AF"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -104,7 +106,7 @@ const styles = StyleSheet.create({
   card: { width: "100%", maxWidth: 400, backgroundColor: "#FFFFFF", borderRadius: 18, padding: 22, borderWidth: 1, borderColor: "#E6E1FF", alignItems: "center", borderTopWidth: 4, borderTopColor: "#2878adff", elevation: 2 },
   title: { fontSize: 26, fontWeight: "800", color: "#0F172A", letterSpacing: 0.2, marginBottom: 6, textAlign: "center" },
   subtitle: { fontSize: 14, color: "#6B7280", marginBottom: 20, textAlign: "center" },
-  input: { width: "100%", paddingVertical: 12, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, borderColor: "#E6E1FF", marginBottom: 12, backgroundColor: "#fff" },
+  input: { width: "100%", paddingVertical: 12, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, borderColor: "#E6E1FF", marginBottom: 12, backgroundColor: "#fff", color: "#1F2937" },
   forgotPassword: { alignSelf: "flex-end", fontSize: 13, color: "#0a3eeaff", textDecorationLine: "underline", marginBottom: 18 },
   button: { backgroundColor: "#6bb0d8ff", paddingVertical: 14, borderRadius: 999, width: "100%", alignItems: "center", marginBottom: 16, borderWidth: 2, borderColor: "#ffffffff" },
   buttonText: { color: "#FFFFFF", fontWeight: "800", fontSize: 16, letterSpacing: 0.4, textTransform: "uppercase" },

@@ -5,6 +5,7 @@
     Alert,
     ScrollView,
     View,
+    KeyboardAvoidingView,
   } from "react-native";
   import { useState } from "react";
   import TextInputComponent from "../../components/TextInputComponent";
@@ -43,9 +44,10 @@
     };
 
     return (
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Tarjeta central */}
-        <View style={styles.card}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+        <ScrollView contentContainerStyle={styles.container}>
+          {/* Tarjeta central */}
+          <View style={styles.card}>
           <Text style={styles.title}>Crear Cuenta</Text>
           <Text style={styles.subtitle}>Regístrate para continuar</Text>
 
@@ -114,6 +116,7 @@
           </Text>
         </View>
       </ScrollView>
+    </KeyboardAvoidingView>
     );
   }
 

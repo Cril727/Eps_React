@@ -9,6 +9,7 @@ import {
   TextInput,
   Modal,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +20,7 @@ export default function Consultorios() {
   const [consultorios, setConsultorios] = useState([]);
   const [doctores, setDoctores] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingConsultorio, setEditingConsultorio] = useState(null);
   const [formData, setFormData] = useState({
@@ -52,6 +54,12 @@ export default function Consultorios() {
     } catch (error) {
       console.error('Error al cargar doctores:', error);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([loadConsultorios(), loadDoctores()]);
+    setRefreshing(false);
   };
 
   const handleCreate = () => {
@@ -180,6 +188,14 @@ export default function Consultorios() {
         renderItem={renderConsultorio}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#0c82ea']}
+            tintColor="#0c82ea"
+          />
+        }
         ListEmptyComponent={
           <View style={styles.center}>
             <Text>No hay consultorios registrados</Text>

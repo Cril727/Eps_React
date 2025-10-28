@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TextInput,
   Modal,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import EspecialidadesService from '../../Src/Services/EspecialidadesService';
@@ -15,6 +16,7 @@ import EspecialidadesService from '../../Src/Services/EspecialidadesService';
 export default function Especialidades() {
   const [especialidades, setEspecialidades] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEspecialidad, setEditingEspecialidad] = useState(null);
   const [especialidad, setEspecialidad] = useState('');
@@ -33,6 +35,12 @@ export default function Especialidades() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadEspecialidades();
+    setRefreshing(false);
   };
 
   const handleCreate = () => {
@@ -139,6 +147,14 @@ export default function Especialidades() {
         renderItem={renderEspecialidad}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#0c82ea']}
+            tintColor="#0c82ea"
+          />
+        }
         ListEmptyComponent={
           <View style={styles.center}>
             <Text>No hay especialidades registradas</Text>
