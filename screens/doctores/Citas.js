@@ -16,8 +16,10 @@ import PacientesService from '../../Src/Services/PacientesService';
 import DoctoresService from '../../Src/Services/DoctoresService';
 import ConsultoriosService from '../../Src/Services/ConsultoriosService';
 import { getUserInfo } from '../../Src/Services/AuthService';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function Citas() {
+  const { theme } = useTheme();
   const [citas, setCitas] = useState([]);
   const [citasPendientes, setCitasPendientes] = useState([]);
   const [doctores, setDoctores] = useState([]);
@@ -307,14 +309,14 @@ export default function Citas() {
   };
 
   const renderCita = ({ item }) => (
-    <View style={styles.citaCard}>
+    <View style={[styles.citaCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
       <View style={styles.citaHeader}>
         {userRole === 'doctor' ? (
-          <Text style={styles.doctorName}>
+          <Text style={[styles.doctorName, { color: theme.colors.text }]}>
             Paciente: {item.paciente?.nombres} {item.paciente?.apellidos}
           </Text>
         ) : (
-          <Text style={styles.doctorName}>
+          <Text style={[styles.doctorName, { color: theme.colors.text }]}>
             Dr. {item.doctor?.nombres} {item.doctor?.apellidos}
           </Text>
         )}
@@ -331,13 +333,13 @@ export default function Citas() {
         </Text>
       )}
 
-      <Text style={styles.fechaText}>{formatDateTime(item.fechaHora)}</Text>
+      <Text style={[styles.fechaText, { color: theme.colors.textSecondary }]}>{formatDateTime(item.fechaHora)}</Text>
 
-      <Text style={styles.consultorioText}>
+      <Text style={[styles.consultorioText, { color: theme.colors.textSecondary }]}>
         Consultorio: {item.consultorio?.codigo} - {item.consultorio?.ubicacion}
       </Text>
 
-      {!!item.novedad && <Text style={styles.novedadText}>Nota: {item.novedad}</Text>}
+      {!!item.novedad && <Text style={[styles.novedadText, { color: theme.colors.textSecondary }]}>Nota: {item.novedad}</Text>}
 
       {userRole === 'doctor' && item.estado === 'Por aprobar' && (
         <View style={styles.doctorActions}>
@@ -374,18 +376,18 @@ export default function Citas() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text>Cargando citas...</Text>
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Cargando citas...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.primary }]}>
         <Text style={styles.title}>Mis Citas</Text>
         {userRole !== 'doctor' && (
-          <TouchableOpacity style={styles.addButton} onPress={handleSolicitarCita}>
+          <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.accent }]} onPress={handleSolicitarCita}>
             <Ionicons name="add" size={24} color="white" />
             <Text style={styles.addButtonText}>Solicitar Cita</Text>
           </TouchableOpacity>
@@ -406,7 +408,7 @@ export default function Citas() {
         </View>
       )}
 
-      <Text style={styles.listSectionTitle}>
+      <Text style={[styles.listSectionTitle, { color: theme.colors.text }]}>
         {userRole === 'doctor' ? 'Todas mis Citas' : 'Mis Citas'}
       </Text>
 
@@ -419,13 +421,13 @@ export default function Citas() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#0c82ea']}
-            tintColor="#0c82ea"
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
           />
         }
         ListEmptyComponent={
           <View style={styles.center}>
-            <Text>
+            <Text style={{ color: theme.colors.textSecondary }}>
               {userRole === 'doctor'
                 ? 'No tienes citas asignadas'
                 : 'No tienes citas programadas'}
@@ -442,30 +444,31 @@ export default function Citas() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Solicitar Nueva Cita</Text>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Solicitar Nueva Cita</Text>
 
             <ScrollView style={styles.form} contentContainerStyle={{ paddingBottom: 16 }}>
               {!selectedDoctor ? (
                 <>
-                  <Text style={styles.formSectionTitle}>Seleccionar Doctor:</Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Seleccionar Doctor:</Text>
                   <View style={{ marginBottom: 12 }}>
                     {doctores.length === 0 ? (
-                      <Text style={{ color: '#666' }}>No hay doctores disponibles</Text>
+                      <Text style={{ color: theme.colors.textSecondary }}>No hay doctores disponibles</Text>
                     ) : (
                       doctores.map((item) => (
                         <TouchableOpacity
                           key={item.id}
                           style={[
                             styles.optionCard,
-                            selectedDoctor?.id === item.id && styles.selectedOption,
+                            { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                            selectedDoctor?.id === item.id && [styles.selectedOption, { backgroundColor: theme.colors.primary + '20', borderColor: theme.colors.primary }],
                           ]}
                           onPress={() => handleDoctorSelect(item)}
                         >
-                          <Text style={styles.optionTitle}>
+                          <Text style={[styles.optionTitle, { color: theme.colors.text }]}>
                             Dr. {item.nombres} {item.apellidos}
                           </Text>
-                          <Text style={styles.optionSubtitle}>
+                          <Text style={[styles.optionSubtitle, { color: theme.colors.textSecondary }]}>
                             {item.especialidad?.especialidad}
                           </Text>
                         </TouchableOpacity>
@@ -475,32 +478,33 @@ export default function Citas() {
                 </>
               ) : !selectedHorario ? (
                 <>
-                  <Text style={styles.formSectionTitle}>Doctor Seleccionado:</Text>
-                  <View style={styles.selectedInfo}>
-                    <Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Doctor Seleccionado:</Text>
+                  <View style={[styles.selectedInfo, { backgroundColor: theme.colors.primary + '20' }]}>
+                    <Text style={{ color: theme.colors.text }}>
                       Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}
                     </Text>
-                    <Text>{selectedDoctor.especialidad?.especialidad}</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>{selectedDoctor.especialidad?.especialidad}</Text>
                   </View>
 
-                  <Text style={styles.formSectionTitle}>Selecciona un Horario:</Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Selecciona un Horario:</Text>
                   <View style={{ marginBottom: 12 }}>
                     {horarios.length === 0 ? (
-                      <Text style={{ color: '#666' }}>No hay horarios disponibles</Text>
+                      <Text style={{ color: theme.colors.textSecondary }}>No hay horarios disponibles</Text>
                     ) : (
                       horarios.map((item) => (
                         <TouchableOpacity
                           key={item.id}
                           style={[
                             styles.optionCard,
-                            selectedHorario?.id === item.id && styles.selectedOption,
+                            { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                            selectedHorario?.id === item.id && [styles.selectedOption, { backgroundColor: theme.colors.primary + '20', borderColor: theme.colors.primary }],
                           ]}
                           onPress={() => handleHorarioSelect(item)}
                         >
-                          <Text style={styles.optionTitle}>
+                          <Text style={[styles.optionTitle, { color: theme.colors.text }]}>
                             {item.horaInicio} - {item.horaFin}
                           </Text>
-                          <Text style={styles.optionSubtitle}>Estado: {item.estado}</Text>
+                          <Text style={[styles.optionSubtitle, { color: theme.colors.textSecondary }]}>Estado: {item.estado}</Text>
                         </TouchableOpacity>
                       ))
                     )}
@@ -515,33 +519,34 @@ export default function Citas() {
                 </>
               ) : !selectedConsultorio ? (
                 <>
-                  <Text style={styles.formSectionTitle}>Horario Seleccionado:</Text>
-                  <View style={styles.selectedInfo}>
-                    <Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Horario Seleccionado:</Text>
+                  <View style={[styles.selectedInfo, { backgroundColor: theme.colors.primary + '20' }]}>
+                    <Text style={{ color: theme.colors.text }}>
                       Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}
                     </Text>
-                    <Text>{selectedDoctor.especialidad?.especialidad}</Text>
-                    <Text>{selectedHorario.horaInicio} - {selectedHorario.horaFin}</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>{selectedDoctor.especialidad?.especialidad}</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>{selectedHorario.horaInicio} - {selectedHorario.horaFin}</Text>
                   </View>
 
-                  <Text style={styles.formSectionTitle}>Selecciona un Consultorio:</Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Selecciona un Consultorio:</Text>
                   <View style={{ marginBottom: 12 }}>
                     {consultorios.length === 0 ? (
-                      <Text style={{ color: '#666' }}>No hay consultorios disponibles</Text>
+                      <Text style={{ color: theme.colors.textSecondary }}>No hay consultorios disponibles</Text>
                     ) : (
                       consultorios.map((item) => (
                         <TouchableOpacity
                           key={item.id}
                           style={[
                             styles.optionCard,
-                            selectedConsultorio?.id === item.id && styles.selectedOption,
+                            { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                            selectedConsultorio?.id === item.id && [styles.selectedOption, { backgroundColor: theme.colors.primary + '20', borderColor: theme.colors.primary }],
                           ]}
                           onPress={() => handleConsultorioSelect(item)}
                         >
-                          <Text style={styles.optionTitle}>
+                          <Text style={[styles.optionTitle, { color: theme.colors.text }]}>
                             {item.codigo} - {item.ubicacion}
                           </Text>
-                          <Text style={styles.optionSubtitle}>Estado: {item.estado}</Text>
+                          <Text style={[styles.optionSubtitle, { color: theme.colors.textSecondary }]}>Estado: {item.estado}</Text>
                         </TouchableOpacity>
                       ))
                     )}
@@ -556,30 +561,31 @@ export default function Citas() {
                 </>
               ) : (
                 <>
-                  <Text style={styles.formSectionTitle}>Confirmar Cita:</Text>
-                  <View style={styles.confirmationInfo}>
-                    <Text style={styles.confirmTitle}>Doctor:</Text>
-                    <Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Confirmar Cita:</Text>
+                  <View style={[styles.confirmationInfo, { backgroundColor: theme.colors.surface }]}>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Doctor:</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>
                       Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}
                     </Text>
 
-                    <Text style={styles.confirmTitle}>Especialidad:</Text>
-                    <Text>{selectedDoctor.especialidad?.especialidad}</Text>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Especialidad:</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>{selectedDoctor.especialidad?.especialidad}</Text>
 
-                    <Text style={styles.confirmTitle}>Horario:</Text>
-                    <Text>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Horario:</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>
                       {selectedHorario.horaInicio} - {selectedHorario.horaFin}
                     </Text>
 
-                    <Text style={styles.confirmTitle}>Consultorio:</Text>
-                    <Text>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Consultorio:</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>
                       {selectedConsultorio.codigo} - {selectedConsultorio.ubicacion}
                     </Text>
 
-                    <Text style={styles.confirmTitle}>Nota adicional:</Text>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Nota adicional:</Text>
                     <TextInput
-                      style={styles.noteInput}
+                      style={[styles.noteInput, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                       placeholder="Describe tu motivo de consulta (opcional)"
+                      placeholderTextColor={theme.colors.textSecondary}
                       value={novedad}
                       onChangeText={setNovedad}
                       multiline
@@ -621,19 +627,17 @@ export default function Citas() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#0c82ea',
   },
   title: { fontSize: 20, fontWeight: 'bold', color: 'white' },
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#28a745',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 5,
@@ -643,17 +647,14 @@ const styles = StyleSheet.create({
   listSectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
     marginLeft: 10,
     marginBottom: 10,
   },
 
   citaCard: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -665,13 +666,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  doctorName: { fontSize: 16, fontWeight: 'bold', color: '#333', flex: 1 },
+  doctorName: { fontSize: 16, fontWeight: 'bold', flex: 1 },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
   statusText: { color: 'white', fontSize: 12, fontWeight: 'bold' },
-  especialidadText: { fontSize: 14, color: '#0c82ea', fontWeight: '500', marginBottom: 4 },
-  fechaText: { fontSize: 14, color: '#666', marginBottom: 4 },
-  consultorioText: { fontSize: 14, color: '#666', marginBottom: 4 },
-  novedadText: { fontSize: 14, color: '#666', fontStyle: 'italic' },
+  especialidadText: { fontSize: 14, fontWeight: '500', marginBottom: 4 },
+  fechaText: { fontSize: 14, marginBottom: 4 },
+  consultorioText: { fontSize: 14, marginBottom: 4 },
+  novedadText: { fontSize: 14, fontStyle: 'italic' },
 
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
@@ -683,7 +684,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     width: '90%',
@@ -692,27 +692,24 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
 
   form: { marginBottom: 20 },
-  formSectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 10, color: '#333' },
+  formSectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 10 },
 
   optionCard: {
-    backgroundColor: '#f8f9fa',
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#dee2e6',
   },
-  selectedOption: { backgroundColor: '#e3f2fd', borderColor: '#0c82ea' },
-  optionTitle: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  optionSubtitle: { fontSize: 14, color: '#666', marginTop: 2 },
+  selectedOption: { borderColor: '#0c82ea' },
+  optionTitle: { fontSize: 16, fontWeight: 'bold' },
+  optionSubtitle: { fontSize: 14, marginTop: 2 },
 
-  selectedInfo: { backgroundColor: '#e3f2fd', padding: 12, borderRadius: 8, marginBottom: 15 },
-  confirmationInfo: { backgroundColor: '#f8f9fa', padding: 15, borderRadius: 8, marginBottom: 15 },
-  confirmTitle: { fontSize: 14, fontWeight: 'bold', color: '#333', marginTop: 8 },
+  selectedInfo: { padding: 12, borderRadius: 8, marginBottom: 15 },
+  confirmationInfo: { padding: 15, borderRadius: 8, marginBottom: 15 },
+  confirmTitle: { fontSize: 14, fontWeight: 'bold', marginTop: 8 },
 
   noteInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
     padding: 10,
     marginTop: 5,
@@ -721,7 +718,7 @@ const styles = StyleSheet.create({
   },
 
   backButton: { alignSelf: 'center', padding: 10, marginTop: 10 },
-  backButtonText: { color: '#0c82ea', fontSize: 14, fontWeight: 'bold' },
+  backButtonText: { fontSize: 14, fontWeight: 'bold' },
 
   modalActions: { flexDirection: 'row', justifyContent: 'space-between' },
   modalButton: { flex: 1, padding: 15, borderRadius: 5, marginHorizontal: 5 },

@@ -18,8 +18,10 @@ import CitasService from '../../Src/Services/CitasService';
 import PacientesService from '../../Src/Services/PacientesService';
 import DoctoresService from '../../Src/Services/DoctoresService';
 import ConsultoriosService from '../../Src/Services/ConsultoriosService';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function AdminCitas() {
+  const { theme } = useTheme();
   const [citas, setCitas] = useState([]);
   const [pacientes, setPacientes] = useState([]);
   const [doctores, setDoctores] = useState([]);
@@ -245,9 +247,9 @@ export default function AdminCitas() {
   };
 
   const renderCita = ({ item }) => (
-    <View style={styles.citaCard}>
+    <View style={[styles.citaCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
       <View style={styles.citaHeader}>
-        <Text style={styles.pacienteName}>
+        <Text style={[styles.pacienteName, { color: theme.colors.text }]}>
           {getPacienteName(item.paciente_id)}
         </Text>
         <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.estado) }]}>
@@ -259,16 +261,16 @@ export default function AdminCitas() {
         {getDoctorName(item.doctor_id)}
       </Text>
 
-      <Text style={styles.fechaText}>
+      <Text style={[styles.fechaText, { color: theme.colors.textSecondary }]}>
         {formatDateTime(item.fechaHora)}
       </Text>
 
-      <Text style={styles.consultorioText}>
+      <Text style={[styles.consultorioText, { color: theme.colors.textSecondary }]}>
         {getConsultorioInfo(item.consultorio_id)}
       </Text>
 
       {item.novedad && (
-        <Text style={styles.novedadText}>
+        <Text style={[styles.novedadText, { color: theme.colors.textSecondary }]}>
           Nota: {item.novedad}
         </Text>
       )}
@@ -292,16 +294,16 @@ export default function AdminCitas() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text>Cargando citas...</Text>
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Cargando citas...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.addButton} onPress={handleCreate}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.primary }]} onPress={handleCreate}>
           <Ionicons name="add" size={24} color="white" />
           <Text style={styles.addButtonText}>Nueva Cita</Text>
         </TouchableOpacity>
@@ -314,7 +316,7 @@ export default function AdminCitas() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.center}>
-            <Text>No hay citas registradas</Text>
+            <Text style={{ color: theme.colors.textSecondary }}>No hay citas registradas</Text>
           </View>
         }
       />
@@ -330,39 +332,39 @@ export default function AdminCitas() {
         }}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
               {editingCita ? 'Editar Cita' : 'Nueva Cita'}
             </Text>
 
             <ScrollView style={styles.form}>
               <View style={styles.dateTimeContainer}>
-                <Text style={styles.sectionTitle}>Fecha y Hora</Text>
+                <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Fecha y Hora</Text>
 
                 <View style={styles.pickerRow}>
                   <TouchableOpacity
-                    style={styles.dateTimeButton}
+                    style={[styles.dateTimeButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
                     onPress={() => setShowDatePicker(true)}
                   >
-                    <Ionicons name="calendar" size={20} color="#0c82ea" />
-                    <Text style={styles.dateTimeButtonText}>
+                    <Ionicons name="calendar" size={20} color={theme.colors.primary} />
+                    <Text style={[styles.dateTimeButtonText, { color: theme.colors.text }]}>
                       {selectedDate.toLocaleDateString('es-ES')}
                     </Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={styles.dateTimeButton}
+                    style={[styles.dateTimeButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
                     onPress={() => setShowTimePicker(true)}
                   >
-                    <Ionicons name="time" size={20} color="#0c82ea" />
-                    <Text style={styles.dateTimeButtonText}>
+                    <Ionicons name="time" size={20} color={theme.colors.primary} />
+                    <Text style={[styles.dateTimeButtonText, { color: theme.colors.text }]}>
                       {selectedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                     </Text>
                   </TouchableOpacity>
                 </View>
 
                 {dateTimeString ? (
-                  <Text style={styles.selectedDateTime}>
+                  <Text style={[styles.selectedDateTime, { backgroundColor: theme.colors.surface, color: theme.colors.primary }]}>
                     Fecha y hora seleccionada: {dateTimeString}
                   </Text>
                 ) : null}
@@ -388,11 +390,11 @@ export default function AdminCitas() {
               </View>
 
               <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Paciente:</Text>
+                <Text style={[styles.pickerLabel, { color: theme.colors.text }]}>Paciente:</Text>
                 <Picker
                   selectedValue={formData.paciente_id}
                   onValueChange={(value) => setFormData({ ...formData, paciente_id: value })}
-                  style={styles.picker}
+                  style={[styles.picker, { backgroundColor: theme.colors.surface, color: theme.colors.text }]}
                 >
                   <Picker.Item label="Seleccionar paciente..." value="" />
                   {pacientes.map((paciente) => (
@@ -406,11 +408,11 @@ export default function AdminCitas() {
               </View>
 
               <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Doctor:</Text>
+                <Text style={[styles.pickerLabel, { color: theme.colors.text }]}>Doctor:</Text>
                 <Picker
                   selectedValue={formData.doctor_id}
                   onValueChange={(value) => setFormData({ ...formData, doctor_id: value })}
-                  style={styles.picker}
+                  style={[styles.picker, { backgroundColor: theme.colors.surface, color: theme.colors.text }]}
                 >
                   <Picker.Item label="Seleccionar doctor..." value="" />
                   {doctores.map((doctor) => (
@@ -424,11 +426,11 @@ export default function AdminCitas() {
               </View>
 
               <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Consultorio:</Text>
+                <Text style={[styles.pickerLabel, { color: theme.colors.text }]}>Consultorio:</Text>
                 <Picker
                   selectedValue={formData.consultorio_id}
                   onValueChange={(value) => setFormData({ ...formData, consultorio_id: value })}
-                  style={styles.picker}
+                  style={[styles.picker, { backgroundColor: theme.colors.surface, color: theme.colors.text }]}
                 >
                   <Picker.Item label="Seleccionar consultorio..." value="" />
                   {consultorios.map((consultorio) => (
@@ -442,11 +444,11 @@ export default function AdminCitas() {
               </View>
 
               <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Estado:</Text>
+                <Text style={[styles.pickerLabel, { color: theme.colors.text }]}>Estado:</Text>
                 <Picker
                   selectedValue={formData.estado}
                   onValueChange={(value) => setFormData({ ...formData, estado: value })}
-                  style={styles.picker}
+                  style={[styles.picker, { backgroundColor: theme.colors.surface, color: theme.colors.text }]}
                 >
                   <Picker.Item label="Programada" value="Programada" />
                   <Picker.Item label="Completada" value="Completada" />
@@ -455,8 +457,9 @@ export default function AdminCitas() {
               </View>
 
               <TextInput
-                style={[styles.input, styles.textArea]}
+                style={[styles.input, styles.textArea, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Novedad (opcional)"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.novedad}
                 onChangeText={(text) => setFormData({ ...formData, novedad: text })}
                 multiline
@@ -490,14 +493,12 @@ export default function AdminCitas() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#ffffffff',
   },
   title: {
     fontSize: 20,
@@ -507,7 +508,6 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#28a745',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 5,
@@ -535,11 +535,9 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   citaCard: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -554,7 +552,6 @@ const styles = StyleSheet.create({
   pacienteName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
     flex: 1,
   },
   doctorName: {
@@ -575,17 +572,14 @@ const styles = StyleSheet.create({
   },
   fechaText: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 4,
   },
   consultorioText: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 4,
   },
   novedadText: {
     fontSize: 14,
-    color: '#666',
     fontStyle: 'italic',
   },
   adminNote: {
@@ -630,7 +624,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     width: '90%',
@@ -651,7 +644,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 10,
   },
   pickerRow: {
@@ -664,16 +656,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
     borderWidth: 1,
-    borderColor: '#dee2e6',
     borderRadius: 8,
     padding: 12,
     marginHorizontal: 5,
   },
   dateTimeButtonText: {
     fontSize: 14,
-    color: '#333',
     marginLeft: 8,
     fontWeight: '500',
   },
@@ -684,12 +673,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 5,
     padding: 8,
-    backgroundColor: '#e3f2fd',
     borderRadius: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
@@ -706,11 +693,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 5,
-    color: '#333',
   },
   picker: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
   },
   modalActions: {

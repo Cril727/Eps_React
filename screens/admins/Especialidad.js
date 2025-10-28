@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import EspecialidadesService from '../../Src/Services/EspecialidadesService';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function Especialidades() {
+  const { theme } = useTheme();
   const [especialidades, setEspecialidades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -104,9 +106,9 @@ export default function Especialidades() {
   };
 
   const renderEspecialidad = ({ item }) => (
-    <View style={styles.especialidadCard}>
+    <View style={[styles.especialidadCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
       <View style={styles.especialidadInfo}>
-        <Text style={styles.especialidadName}>{item.especialidad}</Text>
+        <Text style={[styles.especialidadName, { color: theme.colors.text }]}>{item.especialidad}</Text>
       </View>
       <View style={styles.actions}>
         <TouchableOpacity
@@ -127,16 +129,16 @@ export default function Especialidades() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text>Cargando especialidades...</Text>
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Cargando especialidades...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.addButton} onPress={handleCreate}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.primary }]} onPress={handleCreate}>
           <Ionicons name="add" size={24} color="white" />
           <Text style={styles.addButtonText}>Nueva Especialidad</Text>
         </TouchableOpacity>
@@ -151,13 +153,13 @@ export default function Especialidades() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#0c82ea']}
-            tintColor="#0c82ea"
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
           />
         }
         ListEmptyComponent={
           <View style={styles.center}>
-            <Text>No hay especialidades registradas</Text>
+            <Text style={{ color: theme.colors.textSecondary }}>No hay especialidades registradas</Text>
           </View>
         }
       />
@@ -169,14 +171,15 @@ export default function Especialidades() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
               {editingEspecialidad ? 'Editar Especialidad' : 'Nueva Especialidad'}
             </Text>
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
               placeholder="Nombre de la especialidad"
+              placeholderTextColor={theme.colors.textSecondary}
               value={especialidad}
               onChangeText={setEspecialidad}
               autoCapitalize="words"
@@ -208,14 +211,12 @@ export default function Especialidades() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#ffffffff',
   },
   title: {
     fontSize: 20,
@@ -225,7 +226,6 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#28a745',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 5,
@@ -239,14 +239,12 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   especialidadCard: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -258,7 +256,6 @@ const styles = StyleSheet.create({
   especialidadName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
   actions: {
     flexDirection: 'row',
@@ -286,7 +283,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     width: '90%',
@@ -300,7 +296,6 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
     padding: 15,
     marginBottom: 20,

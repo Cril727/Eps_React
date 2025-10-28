@@ -15,8 +15,10 @@ import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import ConsultoriosService from '../../Src/Services/ConsultoriosService';
 import DoctoresService from '../../Src/Services/DoctoresService';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function Consultorios() {
+  const { theme } = useTheme();
   const [consultorios, setConsultorios] = useState([]);
   const [doctores, setDoctores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -140,11 +142,11 @@ export default function Consultorios() {
   };
 
   const renderConsultorio = ({ item }) => (
-    <View style={styles.consultorioCard}>
+    <View style={[styles.consultorioCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
       <View style={styles.consultorioInfo}>
-        <Text style={styles.consultorioCodigo}>{item.codigo}</Text>
-        <Text style={styles.consultorioUbicacion}>{item.ubicacion}</Text>
-        <Text style={styles.consultorioPiso}>Piso: {item.piso || 'N/A'}</Text>
+        <Text style={[styles.consultorioCodigo, { color: theme.colors.text }]}>{item.codigo}</Text>
+        <Text style={[styles.consultorioUbicacion, { color: theme.colors.textSecondary }]}>{item.ubicacion}</Text>
+        <Text style={[styles.consultorioPiso, { color: theme.colors.textSecondary }]}>Piso: {item.piso || 'N/A'}</Text>
         <Text style={styles.consultorioDoctor}>
           {getDoctorName(item.doctor_id)}
         </Text>
@@ -168,16 +170,16 @@ export default function Consultorios() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text>Cargando consultorios...</Text>
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Cargando consultorios...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.addButton} onPress={handleCreate}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.primary }]} onPress={handleCreate}>
           <Ionicons name="add" size={24} color="white" />
           <Text style={styles.addButtonText}>Nuevo Consultorio</Text>
         </TouchableOpacity>
@@ -192,13 +194,13 @@ export default function Consultorios() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#0c82ea']}
-            tintColor="#0c82ea"
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
           />
         }
         ListEmptyComponent={
           <View style={styles.center}>
-            <Text>No hay consultorios registrados</Text>
+            <Text style={{ color: theme.colors.textSecondary }}>No hay consultorios registrados</Text>
           </View>
         }
       />
@@ -210,38 +212,41 @@ export default function Consultorios() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
               {editingConsultorio ? 'Editar Consultorio' : 'Nuevo Consultorio'}
             </Text>
 
             <ScrollView style={styles.form}>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Código del consultorio *"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.codigo}
                 onChangeText={(text) => setFormData({ ...formData, codigo: text })}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Ubicación *"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.ubicacion}
                 onChangeText={(text) => setFormData({ ...formData, ubicacion: text })}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Piso"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.piso}
                 onChangeText={(text) => setFormData({ ...formData, piso: text })}
                 keyboardType="numeric"
               />
 
               <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Doctor asignado (opcional):</Text>
+                <Text style={[styles.pickerLabel, { color: theme.colors.text }]}>Doctor asignado (opcional):</Text>
                 <Picker
                   selectedValue={formData.doctor_id}
                   onValueChange={(value) => setFormData({ ...formData, doctor_id: value })}
-                  style={styles.picker}
+                  style={[styles.picker, { backgroundColor: theme.colors.surface, color: theme.colors.text }]}
                 >
                   <Picker.Item label="Sin asignar" value="" />
                   {doctores.map((doctor) => (
@@ -281,14 +286,12 @@ export default function Consultorios() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#ffffffff',
   },
   title: {
     fontSize: 20,
@@ -298,7 +301,6 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#28a745',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 5,
@@ -312,14 +314,12 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   consultorioCard: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -331,16 +331,13 @@ const styles = StyleSheet.create({
   consultorioCodigo: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   consultorioUbicacion: {
     fontSize: 16,
-    color: '#666',
     marginTop: 2,
   },
   consultorioPiso: {
     fontSize: 14,
-    color: '#666',
     marginTop: 2,
   },
   consultorioDoctor: {
@@ -375,7 +372,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     width: '90%',
@@ -392,7 +388,6 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
@@ -405,11 +400,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 5,
-    color: '#333',
   },
   picker: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
   },
   modalActions: {

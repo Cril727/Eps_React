@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../Src/Services/ThemeContext';
 
 export default function TextInputComponent({
   label,
@@ -13,17 +14,19 @@ export default function TextInputComponent({
   autoCapitalize = 'none',
   editable = true
 }){
+    const { theme } = useTheme();
+
     return(
         <View style={styles.inputContainer}>
-            <Text style={styles.label}>{label}</Text>
-            <View style={[styles.inputWrapper, error && styles.inputError]}>
+            <Text style={[styles.label, { color: theme.colors.text }]}>{label}</Text>
+            <View style={[styles.inputWrapper, error && styles.inputError, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
                 {leftIcon && (
-                    <Ionicons name={leftIcon} size={20} color="#666" style={styles.icon} />
+                    <Ionicons name={leftIcon} size={20} color={theme.colors.textSecondary} style={styles.icon} />
                 )}
                 <TextInput
-                    style={[styles.input, leftIcon && styles.inputWithIcon]}
+                    style={[styles.input, leftIcon && styles.inputWithIcon, { color: theme.colors.text }]}
                     placeholder={placeholder}
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.colors.textSecondary}
                     autoCapitalize={autoCapitalize}
                     autoCorrect={false}
                     value={value}
@@ -47,17 +50,14 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '500',
         marginBottom: 6,
-        color: '#222',
         marginLeft: 2,
     },
     inputWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
         height: 48,
-        borderColor: '#007AFF',
         borderWidth: 1.5,
         borderRadius: 8,
-        backgroundColor: '#F8F9FB',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.07,
@@ -74,7 +74,6 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 14,
         fontSize: 16,
-        color: '#222',
     },
     inputWithIcon: {
         paddingHorizontal: 10,

@@ -14,8 +14,10 @@ import DoctoresService from '../../Src/Services/DoctoresService';
 import PacientesService from '../../Src/Services/PacientesService';
 import ConsultoriosService from '../../Src/Services/ConsultoriosService';
 import CitasService from '../../Src/Services/CitasService';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function AdminDashboard({ navigation }) {
+  const { theme } = useTheme();
   const [counts, setCounts] = useState({
     especialidades: 0,
     doctores: 0,
@@ -73,40 +75,40 @@ export default function AdminDashboard({ navigation }) {
       title: 'Especialidades',
       count: counts.especialidades,
       icon: 'star',
-      color: '#fde78dff',
-      iconColor: '#f59e0b', 
+      color: theme.isDarkMode ? '#2d3748' : '#fde78dff',
+      iconColor: theme.isDarkMode ? '#fbbf24' : '#f59e0b',
       screen: 'Especialidades',
     },
     {
       title: 'Doctores',
       count: counts.doctores,
       icon: 'person',
-      color: '#a9f1ccff', 
-      iconColor: '#10b981', 
+      color: theme.isDarkMode ? '#1a365d' : '#a9f1ccff',
+      iconColor: theme.isDarkMode ? '#38b2ac' : '#10b981',
       screen: 'Doctores',
     },
     {
       title: 'Pacientes',
       count: counts.pacientes,
       icon: 'people',
-      color: '#82b6fbff', 
-      iconColor: '#3b82f6', 
+      color: theme.isDarkMode ? '#2b6cb0' : '#82b6fbff',
+      iconColor: theme.isDarkMode ? '#63b3ed' : '#3b82f6',
       screen: 'Pacientes',
     },
     {
       title: 'Citas',
       count: counts.citas,
       icon: 'calendar',
-      color: '#fabddfff',
-      iconColor: '#ef4444', 
+      color: theme.isDarkMode ? '#742a2a' : '#fabddfff',
+      iconColor: theme.isDarkMode ? '#fc8181' : '#ef4444',
       screen: 'Citas',
     },
     {
       title: 'Consultorios',
       count: counts.consultorios,
       icon: 'business',
-      color: '#d3affaff', 
-      iconColor: '#8b5cf6',
+      color: theme.isDarkMode ? '#553c9a' : '#d3affaff',
+      iconColor: theme.isDarkMode ? '#a78bfa' : '#8b5cf6',
       screen: 'Consultorios',
     },
   ];
@@ -117,31 +119,31 @@ export default function AdminDashboard({ navigation }) {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text>Cargando dashboard...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Cargando dashboard...</Text>
       </View>
     );
   }
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[theme.colors.primary]} tintColor={theme.colors.primary} />
       }
     >
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: theme.colors.primary }]}>
         <Text style={styles.title}>Panel de Administración</Text>
-        <Text style={styles.subtitle}>Sistema Médico EPS</Text>
+        <Text style={[styles.subtitle, { color: theme.colors.surface }]}>Sistema Médico EPS</Text>
       </View>
 
       <View style={styles.statsContainer}>
-        <Text style={styles.sectionTitle}>Estadísticas Generales</Text>
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Estadísticas Generales</Text>
         <View style={styles.cardsGrid}>
           {dashboardCards.map((card, index) => (
             <TouchableOpacity
               key={index}
-              style={[styles.statCard, { backgroundColor: card.color }]}
+              style={[styles.statCard, { backgroundColor: card.color, shadowColor: theme.colors.shadow }]}
               onPress={() => handleNavigate(card.screen)}
             >
               <View style={styles.cardContent}>
@@ -149,10 +151,10 @@ export default function AdminDashboard({ navigation }) {
                   <Ionicons name={card.icon} size={32} color={card.iconColor} />
                 </View>
                 <View style={styles.textContainer}>
-                  <Text style={styles.cardCount}>{card.count}</Text>
-                  <Text style={styles.cardTitle}>{card.title}</Text>
+                  <Text style={[styles.cardCount, { color: theme.colors.text }]}>{card.count}</Text>
+                  <Text style={[styles.cardTitle, { color: theme.colors.textSecondary }]}>{card.title}</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={24} color="#666" />
+                <Ionicons name="chevron-forward" size={24} color={theme.colors.textSecondary} />
               </View>
             </TouchableOpacity>
           ))}
@@ -160,7 +162,7 @@ export default function AdminDashboard({ navigation }) {
       </View>
 
       <View style={styles.quickActions}>
-        <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Acciones Rápidas</Text>
         <View style={styles.actionButtons}>
           <TouchableOpacity
             style={[styles.actionButton, styles.primaryButton]}
@@ -171,11 +173,11 @@ export default function AdminDashboard({ navigation }) {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, styles.secondaryButton]}
+            style={[styles.actionButton, styles.secondaryButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.primary }]}
             onPress={() => handleNavigate('Citas')}
           >
-            <Ionicons name="add-circle" size={20} color="#0c82ea" />
-            <Text style={styles.secondaryButtonText}>Nueva Cita</Text>
+            <Ionicons name="add-circle" size={20} color={theme.colors.primary} />
+            <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>Nueva Cita</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -186,7 +188,6 @@ export default function AdminDashboard({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   loadingContainer: {
     flex: 1,
@@ -194,7 +195,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    backgroundColor: '#0c82ea',
     padding: 20,
     paddingTop: 40,
     alignItems: 'center',
@@ -207,7 +207,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#e3f2fd',
   },
   statsContainer: {
     padding: 20,
@@ -215,7 +214,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 15,
   },
   cardsGrid: {
@@ -224,7 +222,6 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 12,
     marginBottom: 15,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -250,12 +247,10 @@ const styles = StyleSheet.create({
   cardCount: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 2,
   },
   cardTitle: {
     fontSize: 14,
-    color: '#666',
     fontWeight: '500',
   },
   quickActions: {
@@ -280,9 +275,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0c82ea',
   },
   secondaryButton: {
-    backgroundColor: 'white',
     borderWidth: 1,
-    borderColor: '#0c82ea',
   },
   actionButtonText: {
     color: 'white',
@@ -290,7 +283,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   secondaryButtonText: {
-    color: '#0c82ea',
     fontWeight: '600',
     marginLeft: 8,
   },

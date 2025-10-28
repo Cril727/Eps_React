@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import AppNavegation from "./Src/Navegation/AppNavegation";
 import NotificationService from "./Src/Services/NotificationService";
 import * as Notifications from 'expo-notifications';
+import { ThemeProvider } from './Src/Services/ThemeContext';
 
 export default function App() {
   const notificationListener = useRef();
@@ -66,10 +67,10 @@ export default function App() {
   };
 
   return (
-    <>
+    <ThemeProvider>
       <StatusBar style="auto" />
       <AppNavegation />
-    </>
+    </ThemeProvider>
   );
 }
 

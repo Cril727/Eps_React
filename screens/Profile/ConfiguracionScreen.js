@@ -6,8 +6,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
 import TextInputComponent from '../../components/TextInputComponent';
 import api from '../../Src/Services/Conexion';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function ConfiguracionScreen() {
+    const { theme, toggleTheme } = useTheme();
 
     const [permisoNotificaciones, setPermisoNotificaciones] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -220,34 +222,59 @@ export default function ConfiguracionScreen() {
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <ScrollView style={{ flex: 1, backgroundColor: '#f5f5f5' }} contentContainerStyle={{ paddingBottom: 100 }}>
+            <ScrollView style={{ flex: 1, backgroundColor: theme.colors.background }} contentContainerStyle={{ paddingBottom: 100 }}>
                 <View style={{ padding: 20 }}>
                     {/* Header */}
                     <View style={{ alignItems: 'center', marginBottom: 30 }}>
                         <Ionicons name="settings" size={60} color="#0c82eaff" />
-                        <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#333', marginTop: 10 }}>
+                        <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.colors.text, marginTop: 10 }}>
                             Configuración
                         </Text>
                     </View>
 
-                    {/* Notificaciones Section */}
+                    {/* Theme Section */}
                     <View style={{
-                        backgroundColor: '#fff',
+                        backgroundColor: theme.colors.surface,
                         borderRadius: 10,
                         padding: 20,
                         marginBottom: 20,
-                        shadowColor: '#000',
+                        shadowColor: theme.colors.shadow,
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.1,
                         shadowRadius: 4,
                         elevation: 3
                     }}>
-                        <Text style={{ fontSize: 18, fontWeight: '600', color: '#333', marginBottom: 15 }}>
+                        <Text style={{ fontSize: 18, fontWeight: '600', color: theme.colors.text, marginBottom: 15 }}>
+                            Tema
+                        </Text>
+
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Text style={{ fontSize: 16, color: theme.colors.textSecondary }}>
+                                Tema: {theme.isDarkMode ? 'Oscuro' : 'Claro'}
+                            </Text>
+                            <Switch value={theme.isDarkMode} onValueChange={toggleTheme} />
+                        </View>
+
+                    </View>
+
+                    {/* Notificaciones Section */}
+                    <View style={{
+                        backgroundColor: theme.colors.surface,
+                        borderRadius: 10,
+                        padding: 20,
+                        marginBottom: 20,
+                        shadowColor: theme.colors.shadow,
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
+                        elevation: 3
+                    }}>
+                        <Text style={{ fontSize: 18, fontWeight: '600', color: theme.colors.text, marginBottom: 15 }}>
                             Notificaciones
                         </Text>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Text style={{ fontSize: 16, color: '#666' }}>
+                            <Text style={{ fontSize: 16, color: theme.colors.textSecondary }}>
                                 Notificaciones: {permisoNotificaciones ? 'Activadas' : 'Desactivadas'}
                             </Text>
                             <Switch value={permisoNotificaciones} onValueChange={toggleSwitch} />
@@ -257,17 +284,17 @@ export default function ConfiguracionScreen() {
 
                     {/* Change Password Section */}
                     <View style={{
-                        backgroundColor: '#fff',
+                        backgroundColor: theme.colors.surface,
                         borderRadius: 10,
                         padding: 20,
                         marginBottom: 20,
-                        shadowColor: '#000',
+                        shadowColor: theme.colors.shadow,
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.1,
                         shadowRadius: 4,
                         elevation: 3
                     }}>
-                        <Text style={{ fontSize: 18, fontWeight: '600', color: '#333', marginBottom: 15 }}>
+                        <Text style={{ fontSize: 18, fontWeight: '600', color: theme.colors.text, marginBottom: 15 }}>
                             Cambiar Contraseña
                         </Text>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../Src/Services/ThemeContext';
 
 const AppointmentCard = ({
   item,
@@ -9,6 +10,8 @@ const AppointmentCard = ({
   onReject,
   formatDateTime
 }) => {
+  const { theme } = useTheme();
+
   const getStatusColor = (estado) => {
     switch (estado) {
       case 'Programada':
@@ -23,14 +26,14 @@ const AppointmentCard = ({
   };
 
   return (
-    <View style={styles.citaCard}>
+    <View style={[styles.citaCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
       <View style={styles.citaHeader}>
         {userRole === 'doctor' ? (
-          <Text style={styles.doctorName}>
+          <Text style={[styles.doctorName, { color: theme.colors.text }]}>
             Paciente: {item.paciente?.nombres} {item.paciente?.apellidos}
           </Text>
         ) : (
-          <Text style={styles.doctorName}>
+          <Text style={[styles.doctorName, { color: theme.colors.text }]}>
             Dr. {item.doctor?.nombres} {item.doctor?.apellidos}
           </Text>
         )}
@@ -47,13 +50,13 @@ const AppointmentCard = ({
         </Text>
       )}
 
-      <Text style={styles.fechaText}>{formatDateTime(item.fechaHora)}</Text>
+      <Text style={[styles.fechaText, { color: theme.colors.textSecondary }]}>{formatDateTime(item.fechaHora)}</Text>
 
-      <Text style={styles.consultorioText}>
+      <Text style={[styles.consultorioText, { color: theme.colors.textSecondary }]}>
         Consultorio: {item.consultorio?.codigo} - {item.consultorio?.ubicacion}
       </Text>
 
-      {!!item.novedad && <Text style={styles.novedadText}>Nota: {item.novedad}</Text>}
+      {!!item.novedad && <Text style={[styles.novedadText, { color: theme.colors.textSecondary }]}>Nota: {item.novedad}</Text>}
 
       {userRole === 'doctor' && item.estado === 'Programada' && (
         <View style={styles.doctorActions}>
@@ -79,11 +82,9 @@ const AppointmentCard = ({
 
 const styles = StyleSheet.create({
   citaCard: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -95,13 +96,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  doctorName: { fontSize: 16, fontWeight: 'bold', color: '#333', flex: 1 },
+  doctorName: { fontSize: 16, fontWeight: 'bold', flex: 1 },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
   statusText: { color: 'white', fontSize: 12, fontWeight: 'bold' },
   especialidadText: { fontSize: 14, color: '#0c82ea', fontWeight: '500', marginBottom: 4 },
-  fechaText: { fontSize: 14, color: '#666', marginBottom: 4 },
-  consultorioText: { fontSize: 14, color: '#666', marginBottom: 4 },
-  novedadText: { fontSize: 14, color: '#666', fontStyle: 'italic' },
+  fechaText: { fontSize: 14, marginBottom: 4 },
+  consultorioText: { fontSize: 14, marginBottom: 4 },
+  novedadText: { fontSize: 14, fontStyle: 'italic' },
   doctorActions: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
   doctorActionButton: {
     flex: 1,

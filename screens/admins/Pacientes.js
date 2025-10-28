@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import PacientesService from '../../Src/Services/PacientesService';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function Pacientes() {
+  const { theme } = useTheme();
   const [pacientes, setPacientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -111,13 +113,13 @@ export default function Pacientes() {
   };
 
   const renderPaciente = ({ item }) => (
-    <View style={styles.pacienteCard}>
+    <View style={[styles.pacienteCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
       <View style={styles.pacienteInfo}>
-        <Text style={styles.pacienteName}>
+        <Text style={[styles.pacienteName, { color: theme.colors.text }]}>
           {item.nombres} {item.apellidos}
         </Text>
-        <Text style={styles.pacienteEmail}>{item.email}</Text>
-        <Text style={styles.pacientePhone}>{item.telefono}</Text>
+        <Text style={[styles.pacienteEmail, { color: theme.colors.textSecondary }]}>{item.email}</Text>
+        <Text style={[styles.pacientePhone, { color: theme.colors.textSecondary }]}>{item.telefono}</Text>
       </View>
       <View style={styles.actions}>
         <TouchableOpacity
@@ -138,16 +140,16 @@ export default function Pacientes() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text>Cargando pacientes...</Text>
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Cargando pacientes...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.addButton} onPress={handleCreate}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.primary }]} onPress={handleCreate}>
           <Ionicons name="add" size={24} color="white" />
           <Text style={styles.addButtonText}>Nuevo Paciente</Text>
         </TouchableOpacity>
@@ -160,7 +162,7 @@ export default function Pacientes() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.center}>
-            <Text>No hay pacientes registrados</Text>
+            <Text style={{ color: theme.colors.textSecondary }}>No hay pacientes registrados</Text>
           </View>
         }
       />
@@ -172,43 +174,48 @@ export default function Pacientes() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
               {editingPaciente ? 'Editar Paciente' : 'Nuevo Paciente'}
             </Text>
 
             <ScrollView style={styles.form}>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Nombres"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.nombres}
                 onChangeText={(text) => setFormData({ ...formData, nombres: text })}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Apellidos"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.apellidos}
                 onChangeText={(text) => setFormData({ ...formData, apellidos: text })}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Email"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.email}
                 onChangeText={(text) => setFormData({ ...formData, email: text })}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Teléfono"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.telefono}
                 onChangeText={(text) => setFormData({ ...formData, telefono: text })}
                 keyboardType="phone-pad"
               />
               {!editingPaciente && (
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                   placeholder="Contraseña"
+                  placeholderTextColor={theme.colors.textSecondary}
                   value={formData.password}
                   onChangeText={(text) => setFormData({ ...formData, password: text })}
                   secureTextEntry
@@ -242,14 +249,12 @@ export default function Pacientes() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#ffffffff',
   },
   title: {
     fontSize: 20,
@@ -259,7 +264,6 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#28a745',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 5,
@@ -273,14 +277,12 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   pacienteCard: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -292,16 +294,13 @@ const styles = StyleSheet.create({
   pacienteName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
   pacienteEmail: {
     fontSize: 14,
-    color: '#666',
     marginTop: 2,
   },
   pacientePhone: {
     fontSize: 14,
-    color: '#666',
     marginTop: 2,
   },
   actions: {
@@ -330,7 +329,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     width: '90%',
@@ -347,7 +345,6 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,

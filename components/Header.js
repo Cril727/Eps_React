@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../Src/Services/ThemeContext';
 
 const Header = ({
   title,
@@ -8,10 +9,12 @@ const Header = ({
   addIcon = 'add',
   addText = 'Nuevo',
   showAdd = true,
-  backgroundColor = '#0c82ea'
+  backgroundColor
 }) => {
+  const { theme } = useTheme();
+
   return (
-    <View style={[styles.header, { backgroundColor }]}>
+    <View style={[styles.header, { backgroundColor: backgroundColor || theme.colors.primary }]}>
       <Text style={styles.title}>{title}</Text>
       {showAdd && onAdd && (
         <TouchableOpacity style={styles.addButton} onPress={onAdd}>

@@ -18,12 +18,14 @@ import DoctoresService from '../../Src/Services/DoctoresService';
 import { getUserInfo } from '../../Src/Services/AuthService';
 import { AppointmentCard, SelectionCard, LoadingSpinner, EmptyState, Header } from '../../components';
 import NotificationService from '../../Src/Services/NotificationService';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 // --- Helpers ---
 const pad = (n) => (n < 10 ? `0${n}` : `${n}`);
 const toYMD = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
 export default function Citas() {
+  const { theme } = useTheme();
   const [citas, setCitas] = useState([]);
   const [citasPendientes, setCitasPendientes] = useState([]);
   const [doctores, setDoctores] = useState([]);
@@ -302,7 +304,7 @@ export default function Citas() {
   if (loading) return <LoadingSpinner message="Cargando citas..." />;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Header
         title="Mis Citas"
         onAdd={userRole !== 'doctor' ? handleSolicitarCita : null}
@@ -312,7 +314,7 @@ export default function Citas() {
 
       {userRole === 'doctor' && citasPendientes.length > 0 && (
         <View style={styles.pendingSection}>
-          <Text style={styles.listSectionTitle}>Citas Pendientes</Text>
+          <Text style={[styles.listSectionTitle, { color: theme.colors.text }]}>Citas Pendientes</Text>
           <FlatList
             data={citasPendientes}
             renderItem={renderCita}
@@ -324,7 +326,7 @@ export default function Citas() {
         </View>
       )}
 
-      <Text style={styles.listSectionTitle}>
+      <Text style={[styles.listSectionTitle, { color: theme.colors.text }]}>
         {userRole === 'doctor' ? 'Todas mis Citas' : 'Mis Citas'}
       </Text>
 
@@ -337,8 +339,8 @@ export default function Citas() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#0c82ea']}
-            tintColor="#0c82ea"
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
           />
         }
         ListEmptyComponent={
@@ -352,16 +354,16 @@ export default function Citas() {
       {/* Modal de solicitud */}
       <Modal animationType="slide" transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Solicitar Nueva Cita</Text>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Solicitar Nueva Cita</Text>
 
             <ScrollView style={styles.form} contentContainerStyle={{ paddingBottom: 16 }}>
               {!selectedDoctor ? (
                 <>
-                  <Text style={styles.formSectionTitle}>Seleccionar Doctor:</Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Seleccionar Doctor:</Text>
                   <View style={{ marginBottom: 12 }}>
                     {doctores.length === 0 ? (
-                      <Text style={{ color: '#666' }}>No hay doctores disponibles</Text>
+                      <Text style={{ color: theme.colors.textSecondary }}>No hay doctores disponibles</Text>
                     ) : (
                       doctores.map((item) => (
                         <SelectionCard
@@ -378,16 +380,16 @@ export default function Citas() {
                 </>
               ) : !dateSelected ? (
                 <>
-                  <Text style={styles.formSectionTitle}>Doctor Seleccionado:</Text>
-                  <View style={styles.selectedInfo}>
-                    <Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Doctor Seleccionado:</Text>
+                  <View style={[styles.selectedInfo, { backgroundColor: theme.colors.surface }]}>
+                    <Text style={{ color: theme.colors.text }}>
                       Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}
                     </Text>
-                    <Text>{selectedDoctor.especialidad?.especialidad}</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>{selectedDoctor.especialidad?.especialidad}</Text>
                   </View>
 
-                  <Text style={styles.formSectionTitle}>Seleccionar Día:</Text>
-                  <View style={styles.calendarWrapper}>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Seleccionar Día:</Text>
+                  <View style={[styles.calendarWrapper, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
                     <DateTimePicker
                       value={selectedDate ?? new Date()}
                       mode="date"
@@ -407,20 +409,20 @@ export default function Citas() {
                       setHorarios([]);
                     }}
                   >
-                    <Text style={styles.backButtonText}>Cambiar Doctor</Text>
+                    <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>Cambiar Doctor</Text>
                   </TouchableOpacity>
                 </>
               ) : !selectedHorario ? (
                 <>
-                  <Text style={styles.formSectionTitle}>Día Seleccionado:</Text>
-                  <View style={styles.selectedInfo}>
-                    <Text>{selectedDate?.toLocaleDateString('es-ES')}</Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Día Seleccionado:</Text>
+                  <View style={[styles.selectedInfo, { backgroundColor: theme.colors.surface }]}>
+                    <Text style={{ color: theme.colors.text }}>{selectedDate?.toLocaleDateString('es-ES')}</Text>
                   </View>
 
-                  <Text style={styles.formSectionTitle}>Selecciona un Horario:</Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Selecciona un Horario:</Text>
                   <View style={{ marginBottom: 12 }}>
                     {horarios.length === 0 ? (
-                      <Text style={{ color: '#666' }}>No hay horarios disponibles para ese día</Text>
+                      <Text style={{ color: theme.colors.textSecondary }}>No hay horarios disponibles para ese día</Text>
                     ) : (
                       horarios.map((item) => (
                         <SelectionCard
@@ -443,7 +445,7 @@ export default function Citas() {
                       setDateSelected(false);
                     }}
                   >
-                    <Text style={styles.backButtonText}>Cambiar Día</Text>
+                    <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>Cambiar Día</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -456,26 +458,26 @@ export default function Citas() {
                       setHorarios([]);
                     }}
                   >
-                    <Text style={styles.backButtonText}>Cambiar Doctor</Text>
+                    <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>Cambiar Doctor</Text>
                   </TouchableOpacity>
                 </>
               ) : !selectedConsultorio ? (
                 <>
-                  <Text style={styles.formSectionTitle}>Horario Seleccionado:</Text>
-                  <View style={styles.selectedInfo}>
-                    <Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Horario Seleccionado:</Text>
+                  <View style={[styles.selectedInfo, { backgroundColor: theme.colors.surface }]}>
+                    <Text style={{ color: theme.colors.text }}>
                       Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}
                     </Text>
-                    <Text>{selectedDoctor.especialidad?.especialidad}</Text>
-                    <Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>{selectedDoctor.especialidad?.especialidad}</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>
                       {selectedDate?.toLocaleDateString('es-ES')} — {selectedHorario.horaInicio} - {selectedHorario.horaFin}
                     </Text>
                   </View>
 
-                  <Text style={styles.formSectionTitle}>Selecciona un Consultorio:</Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Selecciona un Consultorio:</Text>
                   <View style={{ marginBottom: 12 }}>
                     {consultorios.length === 0 ? (
-                      <Text style={{ color: '#666' }}>No hay consultorios disponibles</Text>
+                      <Text style={{ color: theme.colors.textSecondary }}>No hay consultorios disponibles</Text>
                     ) : (
                       consultorios.map((item) => (
                         <SelectionCard
@@ -498,7 +500,7 @@ export default function Citas() {
                       setSelectedHorario(null);
                     }}
                   >
-                    <Text style={styles.backButtonText}>Cambiar Horario</Text>
+                    <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>Cambiar Horario</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -509,38 +511,39 @@ export default function Citas() {
                       setDateSelected(false);
                     }}
                   >
-                    <Text style={styles.backButtonText}>Cambiar Día</Text>
+                    <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>Cambiar Día</Text>
                   </TouchableOpacity>
                 </>
               ) : (
                 <>
-                  <Text style={styles.formSectionTitle}>Confirmar Cita:</Text>
-                  <View style={styles.confirmationInfo}>
-                    <Text style={styles.confirmTitle}>Doctor:</Text>
-                    <Text>
+                  <Text style={[styles.formSectionTitle, { color: theme.colors.text }]}>Confirmar Cita:</Text>
+                  <View style={[styles.confirmationInfo, { backgroundColor: theme.colors.surface }]}>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Doctor:</Text>
+                    <Text style={{ color: theme.colors.text }}>
                       Dr. {selectedDoctor.nombres} {selectedDoctor.apellidos}
                     </Text>
 
-                    <Text style={styles.confirmTitle}>Especialidad:</Text>
-                    <Text>{selectedDoctor.especialidad?.especialidad}</Text>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Especialidad:</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>{selectedDoctor.especialidad?.especialidad}</Text>
 
-                    <Text style={styles.confirmTitle}>Fecha:</Text>
-                    <Text>{selectedDate?.toLocaleDateString('es-ES')}</Text>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Fecha:</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>{selectedDate?.toLocaleDateString('es-ES')}</Text>
 
-                    <Text style={styles.confirmTitle}>Horario:</Text>
-                    <Text>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Horario:</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>
                       {selectedHorario.horaInicio} - {selectedHorario.horaFin}
                     </Text>
 
-                    <Text style={styles.confirmTitle}>Consultorio:</Text>
-                    <Text>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Consultorio:</Text>
+                    <Text style={{ color: theme.colors.textSecondary }}>
                       {selectedConsultorio.codigo} - {selectedConsultorio.ubicacion}
                     </Text>
 
-                    <Text style={styles.confirmTitle}>Nota adicional:</Text>
+                    <Text style={[styles.confirmTitle, { color: theme.colors.text }]}>Nota adicional:</Text>
                     <TextInput
-                      style={styles.noteInput}
+                      style={[styles.noteInput, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                       placeholder="Describe tu motivo de consulta (opcional)"
+                      placeholderTextColor={theme.colors.textSecondary}
                       value={novedad}
                       onChangeText={setNovedad}
                       multiline
@@ -549,7 +552,7 @@ export default function Citas() {
                   </View>
 
                   <TouchableOpacity style={styles.backButton} onPress={() => setSelectedConsultorio(null)}>
-                    <Text style={styles.backButtonText}>Cambiar Consultorio</Text>
+                    <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>Cambiar Consultorio</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -559,7 +562,7 @@ export default function Citas() {
                       setSelectedHorario(null);
                     }}
                   >
-                    <Text style={styles.backButtonText}>Cambiar Horario</Text>
+                    <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>Cambiar Horario</Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -586,12 +589,11 @@ export default function Citas() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1 },
   list: { padding: 10 },
   listSectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
     marginLeft: 10,
     marginBottom: 10,
   },
@@ -602,7 +604,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     width: '90%',
@@ -610,13 +611,12 @@ const styles = StyleSheet.create({
   },
   modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
   form: { marginBottom: 20 },
-  formSectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 10, color: '#333' },
-  selectedInfo: { backgroundColor: '#e3f2fd', padding: 12, borderRadius: 8, marginBottom: 15 },
-  confirmationInfo: { backgroundColor: '#f8f9fa', padding: 15, borderRadius: 8, marginBottom: 15 },
-  confirmTitle: { fontSize: 14, fontWeight: 'bold', color: '#333', marginTop: 8 },
+  formSectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 10 },
+  selectedInfo: { padding: 12, borderRadius: 8, marginBottom: 15 },
+  confirmationInfo: { padding: 15, borderRadius: 8, marginBottom: 15 },
+  confirmTitle: { fontSize: 14, fontWeight: 'bold', marginTop: 8 },
   noteInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
     padding: 10,
     marginTop: 5,
@@ -624,13 +624,11 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   backButton: { alignSelf: 'center', padding: 10, marginTop: 10 },
-  backButtonText: { color: '#0c82ea', fontSize: 14, fontWeight: 'bold' },
+  backButtonText: { fontSize: 14, fontWeight: 'bold' },
   calendarWrapper: {
-    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 8,
     borderWidth: 1,
-    borderColor: '#eee',
     marginBottom: 12,
   },
   modalActions: { flexDirection: 'row', justifyContent: 'space-between' },

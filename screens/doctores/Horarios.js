@@ -14,8 +14,10 @@ import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import DoctoresService from '../../Src/Services/DoctoresService';
 import { getUserInfo } from '../../Src/Services/AuthService';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function Horarios() {
+  const { theme } = useTheme();
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -123,9 +125,9 @@ export default function Horarios() {
   };
 
   const renderHorario = ({ item }) => (
-    <View style={styles.horarioCard}>
+    <View style={[styles.horarioCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
       <View style={styles.horarioInfo}>
-        <Text style={styles.horarioTime}>
+        <Text style={[styles.horarioTime, { color: theme.colors.text }]}>
           {item.horaInicio.substring(0, 5)} - {item.horaFin.substring(0, 5)}
         </Text>
         <View style={[styles.statusBadge, item.estado === 'Activo' ? styles.activeBadge : styles.inactiveBadge]}>
@@ -151,17 +153,17 @@ export default function Horarios() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text>Cargando horarios...</Text>
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Cargando horarios...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.primary }]}>
         <Text style={styles.title}>Mis Horarios</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleCreate}>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.accent }]} onPress={handleCreate}>
           <Ionicons name="add" size={24} color="white" />
           <Text style={styles.addButtonText}>Nuevo Horario</Text>
         </TouchableOpacity>
@@ -174,7 +176,7 @@ export default function Horarios() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.center}>
-            <Text>No tienes horarios configurados</Text>
+            <Text style={{ color: theme.colors.textSecondary }}>No tienes horarios configurados</Text>
           </View>
         }
       />
@@ -186,104 +188,118 @@ export default function Horarios() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
               {editingHorario ? 'Editar Horario' : 'Nuevo Horario'}
             </Text>
 
-            <ScrollView style={styles.form}>
-               <Text style={styles.inputLabel}>Hora de Inicio</Text>
+            <ScrollView style={[styles.form, { backgroundColor: theme.colors.surface }]}>
+               <Text style={[styles.inputLabel, { color: theme.colors.text }]}>Hora de Inicio</Text>
                <View style={styles.timePickerContainer}>
                  <View style={styles.timePicker}>
-                   <Text style={styles.timePickerLabel}>Hora</Text>
-                   <Picker
-                     selectedValue={formData.horaInicio.split(':')[0]}
-                     onValueChange={(value) => {
-                       const minutes = formData.horaInicio.split(':')[1] || '00';
-                       setFormData({ ...formData, horaInicio: `${value}:${minutes}` });
-                     }}
-                     style={styles.picker}
-                   >
-                     {Array.from({ length: 24 }, (_, i) => (
-                       <Picker.Item key={i} label={i.toString().padStart(2, '0')} value={i.toString().padStart(2, '0')} />
-                     ))}
-                   </Picker>
+                   <Text style={[styles.timePickerLabel, { color: theme.colors.text }]}>Hora</Text>
+                   <View style={[styles.pickerContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                     <Picker
+                       selectedValue={formData.horaInicio.split(':')[0]}
+                       onValueChange={(value) => {
+                         const minutes = formData.horaInicio.split(':')[1] || '00';
+                         setFormData({ ...formData, horaInicio: `${value}:${minutes}` });
+                       }}
+                       style={[styles.picker, { color: theme.colors.text }]}
+                       dropdownIconColor={theme.colors.text}
+                     >
+                       {Array.from({ length: 24 }, (_, i) => (
+                         <Picker.Item key={i} label={i.toString().padStart(2, '0')} value={i.toString().padStart(2, '0')} />
+                       ))}
+                     </Picker>
+                   </View>
                  </View>
                  <View style={styles.timePicker}>
-                   <Text style={styles.timePickerLabel}>Minutos</Text>
-                   <Picker
-                     selectedValue={formData.horaInicio.split(':')[1] || '00'}
-                     onValueChange={(value) => {
-                       const hours = formData.horaInicio.split(':')[0];
-                       setFormData({ ...formData, horaInicio: `${hours}:${value}` });
-                     }}
-                     style={styles.picker}
-                   >
-                     {Array.from({ length: 60 }, (_, i) => (
-                       <Picker.Item key={i} label={i.toString().padStart(2, '0')} value={i.toString().padStart(2, '0')} />
-                     ))}
-                   </Picker>
+                   <Text style={[styles.timePickerLabel, { color: theme.colors.text }]}>Minutos</Text>
+                   <View style={[styles.pickerContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                     <Picker
+                       selectedValue={formData.horaInicio.split(':')[1] || '00'}
+                       onValueChange={(value) => {
+                         const hours = formData.horaInicio.split(':')[0];
+                         setFormData({ ...formData, horaInicio: `${hours}:${value}` });
+                       }}
+                       style={[styles.picker, { color: theme.colors.text }]}
+                       dropdownIconColor={theme.colors.text}
+                     >
+                       {Array.from({ length: 60 }, (_, i) => (
+                         <Picker.Item key={i} label={i.toString().padStart(2, '0')} value={i.toString().padStart(2, '0')} />
+                       ))}
+                     </Picker>
+                   </View>
                  </View>
                </View>
-               <Text style={styles.timeDisplay}>Hora seleccionada: {formData.horaInicio}</Text>
+               <Text style={[styles.timeDisplay, { color: theme.colors.text }]}>Hora seleccionada: {formData.horaInicio}</Text>
 
-               <Text style={styles.inputLabel}>Hora de Fin</Text>
+               <Text style={[styles.inputLabel, { color: theme.colors.text }]}>Hora de Fin</Text>
                <View style={styles.timePickerContainer}>
                  <View style={styles.timePicker}>
-                   <Text style={styles.timePickerLabel}>Hora</Text>
-                   <Picker
-                     selectedValue={formData.horaFin.split(':')[0]}
-                     onValueChange={(value) => {
-                       const minutes = formData.horaFin.split(':')[1] || '00';
-                       setFormData({ ...formData, horaFin: `${value}:${minutes}` });
-                     }}
-                     style={styles.picker}
-                   >
-                     {Array.from({ length: 24 }, (_, i) => (
-                       <Picker.Item key={i} label={i.toString().padStart(2, '0')} value={i.toString().padStart(2, '0')} />
-                     ))}
-                   </Picker>
+                   <Text style={[styles.timePickerLabel, { color: theme.colors.text }]}>Hora</Text>
+                   <View style={[styles.pickerContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                     <Picker
+                       selectedValue={formData.horaFin.split(':')[0]}
+                       onValueChange={(value) => {
+                         const minutes = formData.horaFin.split(':')[1] || '00';
+                         setFormData({ ...formData, horaFin: `${value}:${minutes}` });
+                       }}
+                       style={[styles.picker, { color: theme.colors.text }]}
+                       dropdownIconColor={theme.colors.text}
+                     >
+                       {Array.from({ length: 24 }, (_, i) => (
+                         <Picker.Item key={i} label={i.toString().padStart(2, '0')} value={i.toString().padStart(2, '0')} />
+                       ))}
+                     </Picker>
+                   </View>
                  </View>
                  <View style={styles.timePicker}>
-                   <Text style={styles.timePickerLabel}>Minutos</Text>
-                   <Picker
-                     selectedValue={formData.horaFin.split(':')[1] || '00'}
-                     onValueChange={(value) => {
-                       const hours = formData.horaFin.split(':')[0];
-                       setFormData({ ...formData, horaFin: `${hours}:${value}` });
-                     }}
-                     style={styles.picker}
-                   >
-                     {Array.from({ length: 60 }, (_, i) => (
-                       <Picker.Item key={i} label={i.toString().padStart(2, '0')} value={i.toString().padStart(2, '0')} />
-                     ))}
-                   </Picker>
+                   <Text style={[styles.timePickerLabel, { color: theme.colors.text }]}>Minutos</Text>
+                   <View style={[styles.pickerContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                     <Picker
+                       selectedValue={formData.horaFin.split(':')[1] || '00'}
+                       onValueChange={(value) => {
+                         const hours = formData.horaFin.split(':')[0];
+                         setFormData({ ...formData, horaFin: `${hours}:${value}` });
+                       }}
+                       style={[styles.picker, { color: theme.colors.text }]}
+                       dropdownIconColor={theme.colors.text}
+                     >
+                       {Array.from({ length: 60 }, (_, i) => (
+                         <Picker.Item key={i} label={i.toString().padStart(2, '0')} value={i.toString().padStart(2, '0')} />
+                       ))}
+                     </Picker>
+                   </View>
                  </View>
                </View>
-               <Text style={styles.timeDisplay}>Hora seleccionada: {formData.horaFin}</Text>
+               <Text style={[styles.timeDisplay, { color: theme.colors.text }]}>Hora seleccionada: {formData.horaFin}</Text>
 
               <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Estado:</Text>
+                <Text style={[styles.pickerLabel, { color: theme.colors.text }]}>Estado:</Text>
                 <View style={styles.statusOptions}>
                   <TouchableOpacity
                     style={[
                       styles.statusOption,
-                      formData.estado === 'Activo' && styles.selectedStatus,
+                      { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                      formData.estado === 'Activo' && [styles.selectedStatus, { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary }],
                     ]}
                     onPress={() => setFormData({ ...formData, estado: 'Activo' })}
                   >
-                    <Text style={formData.estado === 'Activo' ? styles.selectedStatusText : styles.statusText}>
+                    <Text style={formData.estado === 'Activo' ? styles.selectedStatusText : [styles.statusText, { color: theme.colors.text }]}>
                       Activo
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[
                       styles.statusOption,
-                      formData.estado === 'Inactivo' && styles.selectedStatus,
+                      { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                      formData.estado === 'Inactivo' && [styles.selectedStatus, { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary }],
                     ]}
                     onPress={() => setFormData({ ...formData, estado: 'Inactivo' })}
                   >
-                    <Text style={formData.estado === 'Inactivo' ? styles.selectedStatusText : styles.statusText}>
+                    <Text style={formData.estado === 'Inactivo' ? styles.selectedStatusText : [styles.statusText, { color: theme.colors.text }]}>
                       Inactivo
                     </Text>
                   </TouchableOpacity>
@@ -317,14 +333,12 @@ export default function Horarios() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#0c82ea',
   },
   title: {
     fontSize: 20,
@@ -334,7 +348,6 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#28a745',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 5,
@@ -348,14 +361,12 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   horarioCard: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -367,7 +378,6 @@ const styles = StyleSheet.create({
   horarioTime: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -413,7 +423,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     width: '90%',
@@ -427,29 +436,31 @@ const styles = StyleSheet.create({
   },
   form: {
     marginBottom: 20,
+    maxHeight: 400,
   },
   inputLabel: {
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 5,
-    color: '#333',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
     padding: 10,
     marginBottom: 15,
     fontSize: 16,
   },
   pickerContainer: {
-    marginBottom: 15,
-  },
+  borderRadius: 5,
+  height: 40,
+  justifyContent: 'center',
+  borderColor: '#ccc', // agrega esto
+  marginBottom: 15,
+},
   pickerLabel: {
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 10,
-    color: '#333',
   },
   statusOptions: {
     flexDirection: 'row',
@@ -459,18 +470,15 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
     marginHorizontal: 5,
     alignItems: 'center',
   },
   selectedStatus: {
-    backgroundColor: '#0c82ea',
     borderColor: '#0c82ea',
   },
   statusText: {
     fontSize: 14,
-    color: '#666',
   },
   selectedStatusText: {
     color: 'white',
@@ -515,20 +523,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     marginBottom: 5,
-    color: '#333',
     textAlign: 'center',
   },
   timeDisplay: {
     fontSize: 14,
-    color: '#0c82ea',
     textAlign: 'center',
     marginBottom: 15,
     fontWeight: '500',
   },
   picker: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 5,
     height: 40,
   },
 });

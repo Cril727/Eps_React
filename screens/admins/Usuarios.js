@@ -14,8 +14,10 @@ import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import UserService from '../../Src/Services/UserService';
 import RolesService from '../../Src/Services/RolesService';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function Usuarios() {
+  const { theme } = useTheme();
   const [usuarios, setUsuarios] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -150,13 +152,13 @@ export default function Usuarios() {
   };
 
   const renderUsuario = ({ item }) => (
-    <View style={styles.usuarioCard}>
+    <View style={[styles.usuarioCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
       <View style={styles.usuarioInfo}>
-        <Text style={styles.usuarioName}>
+        <Text style={[styles.usuarioName, { color: theme.colors.text }]}>
           {item.nombres} {item.apellidos}
         </Text>
-        <Text style={styles.usuarioEmail}>{item.email}</Text>
-        <Text style={styles.usuarioPhone}>{item.telefono}</Text>
+        <Text style={[styles.usuarioEmail, { color: theme.colors.textSecondary }]}>{item.email}</Text>
+        <Text style={[styles.usuarioPhone, { color: theme.colors.textSecondary }]}>{item.telefono}</Text>
         <View style={[styles.rolBadge, getRolColor(item.rol_id)]}>
           <Text style={styles.rolText}>{getRolName(item.rol_id)}</Text>
         </View>
@@ -194,16 +196,16 @@ export default function Usuarios() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text>Cargando usuarios...</Text>
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Cargando usuarios...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.addButton} onPress={handleCreate}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.primary }]} onPress={handleCreate}>
           <Ionicons name="add" size={24} color="white" />
           <Text style={styles.addButtonText}>Nuevo Usuario</Text>
         </TouchableOpacity>
@@ -216,7 +218,7 @@ export default function Usuarios() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.center}>
-            <Text>No hay usuarios registrados</Text>
+            <Text style={{ color: theme.colors.textSecondary }}>No hay usuarios registrados</Text>
           </View>
         }
       />
@@ -228,35 +230,39 @@ export default function Usuarios() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
               {editingUsuario ? 'Editar Usuario' : 'Nuevo Usuario'}
             </Text>
 
             <ScrollView style={styles.form}>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Nombres *"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.nombres}
                 onChangeText={(text) => setFormData({ ...formData, nombres: text })}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Apellidos *"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.apellidos}
                 onChangeText={(text) => setFormData({ ...formData, apellidos: text })}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Email *"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.email}
                 onChangeText={(text) => setFormData({ ...formData, email: text })}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Teléfono"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.telefono}
                 onChangeText={(text) => setFormData({ ...formData, telefono: text })}
                 keyboardType="phone-pad"
@@ -265,8 +271,9 @@ export default function Usuarios() {
 
               {!editingUsuario && (
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                   placeholder="Contraseña *"
+                  placeholderTextColor={theme.colors.textSecondary}
                   value={formData.password}
                   onChangeText={(text) => setFormData({ ...formData, password: text })}
                   secureTextEntry
@@ -300,13 +307,11 @@ export default function Usuarios() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     justifyContent: 'space-between',
     alignItems: 'flex-end',
     padding: 20,
-    backgroundColor: '#ffffffff',
   },
   title: {
     fontSize: 20,
@@ -316,7 +321,6 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#28a745',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 5,
@@ -330,14 +334,12 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   usuarioCard: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -349,16 +351,13 @@ const styles = StyleSheet.create({
   usuarioName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
   usuarioEmail: {
     fontSize: 14,
-    color: '#666',
     marginTop: 2,
   },
   usuarioPhone: {
     fontSize: 14,
-    color: '#666',
     marginTop: 2,
   },
   rolBadge: {
@@ -399,7 +398,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     width: '90%',
@@ -416,7 +414,6 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
@@ -429,11 +426,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 5,
-    color: '#333',
   },
   picker: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
   },
   modalActions: {

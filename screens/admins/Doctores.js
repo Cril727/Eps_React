@@ -14,8 +14,10 @@ import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import DoctoresService from '../../Src/Services/DoctoresService';
 import EspecialidadesService from '../../Src/Services/EspecialidadesService';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function Doctores() {
+  const { theme } = useTheme();
   const [doctores, setDoctores] = useState([]);
   const [especialidades, setEspecialidades] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -146,16 +148,16 @@ export default function Doctores() {
   };
 
   const renderDoctor = ({ item }) => (
-    <View style={styles.doctorCard}>
+    <View style={[styles.doctorCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
       <View style={styles.doctorInfo}>
-        <Text style={styles.doctorName}>
+        <Text style={[styles.doctorName, { color: theme.colors.text }]}>
           Dr. {item.nombres} {item.apellidos}
         </Text>
         <Text style={styles.doctorEspecialidad}>
           {getEspecialidadName(item.especialidad_id)}
         </Text>
-        <Text style={styles.doctorEmail}>{item.email}</Text>
-        <Text style={styles.doctorPhone}>{item.telefono}</Text>
+        <Text style={[styles.doctorEmail, { color: theme.colors.textSecondary }]}>{item.email}</Text>
+        <Text style={[styles.doctorPhone, { color: theme.colors.textSecondary }]}>{item.telefono}</Text>
         <View style={[styles.statusBadge, item.estado === 'Activo' ? styles.activeBadge : styles.inactiveBadge]}>
           <Text style={styles.statusText}>{item.estado}</Text>
         </View>
@@ -179,16 +181,16 @@ export default function Doctores() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text>Cargando doctores...</Text>
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Cargando doctores...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.addButton} onPress={handleCreate}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.primary }]} onPress={handleCreate}>
           <Ionicons name="add" size={24} color="white" />
           <Text style={styles.addButtonText}>Nuevo Doctor</Text>
         </TouchableOpacity>
@@ -201,7 +203,7 @@ export default function Doctores() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.center}>
-            <Text>No hay doctores registrados</Text>
+            <Text style={{ color: theme.colors.textSecondary }}>No hay doctores registrados</Text>
           </View>
         }
       />
@@ -213,46 +215,50 @@ export default function Doctores() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
               {editingDoctor ? 'Editar Doctor' : 'Nuevo Doctor'}
             </Text>
 
             <ScrollView style={styles.form}>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Nombres"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.nombres}
                 onChangeText={(text) => setFormData({ ...formData, nombres: text })}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Apellidos"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.apellidos}
                 onChangeText={(text) => setFormData({ ...formData, apellidos: text })}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Email"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.email}
                 onChangeText={(text) => setFormData({ ...formData, email: text })}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
                 placeholder="Teléfono"
+                placeholderTextColor={theme.colors.textSecondary}
                 value={formData.telefono}
                 onChangeText={(text) => setFormData({ ...formData, telefono: text })}
                 keyboardType="phone-pad"
               />
 
               <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Especialidad:</Text>
+                <Text style={[styles.pickerLabel, { color: theme.colors.text }]}>Especialidad:</Text>
                 <Picker
                   selectedValue={formData.especialidad_id}
                   onValueChange={(value) => setFormData({ ...formData, especialidad_id: value })}
-                  style={styles.picker}
+                  style={[styles.picker, { backgroundColor: theme.colors.surface, color: theme.colors.text }]}
                 >
                   <Picker.Item label="Seleccionar especialidad..." value="" />
                   {especialidades.map((esp) => (
@@ -262,11 +268,11 @@ export default function Doctores() {
               </View>
 
               <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Estado:</Text>
+                <Text style={[styles.pickerLabel, { color: theme.colors.text }]}>Estado:</Text>
                 <Picker
                   selectedValue={formData.estado}
                   onValueChange={(value) => setFormData({ ...formData, estado: value })}
-                  style={styles.picker}
+                  style={[styles.picker, { backgroundColor: theme.colors.surface, color: theme.colors.text }]}
                 >
                   <Picker.Item label="Activo" value="Activo" />
                   <Picker.Item label="Inactivo" value="Inactivo" />
@@ -301,14 +307,12 @@ export default function Doctores() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#ffffffff',
   },
   title: {
     fontSize: 20,
@@ -318,7 +322,6 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#28a745',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 5,
@@ -332,14 +335,12 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   doctorCard: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -351,7 +352,6 @@ const styles = StyleSheet.create({
   doctorName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
   doctorEspecialidad: {
     fontSize: 14,
@@ -361,12 +361,10 @@ const styles = StyleSheet.create({
   },
   doctorEmail: {
     fontSize: 14,
-    color: '#666',
     marginTop: 2,
   },
   doctorPhone: {
     fontSize: 14,
-    color: '#666',
     marginTop: 2,
   },
   statusBadge: {
@@ -413,7 +411,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     width: '90%',
@@ -430,7 +427,6 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
@@ -443,11 +439,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 5,
-    color: '#333',
   },
   picker: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 5,
   },
   modalActions: {

@@ -11,8 +11,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { logout, getUserInfo } from '../../Src/Services/AuthService';
 import { DeviceEventEmitter } from 'react-native';
+import { useTheme } from '../../Src/Services/ThemeContext';
 
 export default function Profile({ navigation }) {
+  const { theme } = useTheme();
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -76,24 +78,24 @@ export default function Profile({ navigation }) {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text>Cargando perfil...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Cargando perfil...</Text>
       </View>
     );
   }
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.avatarContainer}>
           <Ionicons name="person-circle" size={100} color="#0c82eaff" />
         </View>
-        <Text style={styles.name}>
+        <Text style={[styles.name, { color: theme.colors.text }]}>
           {userProfile?.nombres} {userProfile?.apellidos}
         </Text>
         <Text style={styles.role}>
@@ -101,28 +103,28 @@ export default function Profile({ navigation }) {
         </Text>
       </View>
 
-      <View style={styles.infoContainer}>
+      <View style={[styles.infoContainer, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.infoItem}>
-          <Ionicons name="mail" size={20} color="#666" />
+          <Ionicons name="mail" size={20} color={theme.colors.textSecondary} />
           <View style={styles.infoText}>
-            <Text style={styles.infoLabel}>Email</Text>
-            <Text style={styles.infoValue}>{userProfile?.email}</Text>
+            <Text style={[styles.infoLabel, { color: theme.colors.textSecondary }]}>Email</Text>
+            <Text style={[styles.infoValue, { color: theme.colors.text }]}>{userProfile?.email}</Text>
           </View>
         </View>
 
         <View style={styles.infoItem}>
-          <Ionicons name="call" size={20} color="#666" />
+          <Ionicons name="call" size={20} color={theme.colors.textSecondary} />
           <View style={styles.infoText}>
-            <Text style={styles.infoLabel}>Teléfono</Text>
-            <Text style={styles.infoValue}>{userProfile?.telefono}</Text>
+            <Text style={[styles.infoLabel, { color: theme.colors.textSecondary }]}>Teléfono</Text>
+            <Text style={[styles.infoValue, { color: theme.colors.text }]}>{userProfile?.telefono}</Text>
           </View>
         </View>
 
         <View style={styles.infoItem}>
-          <Ionicons name="person" size={20} color="#666" />
+          <Ionicons name="person" size={20} color={theme.colors.textSecondary} />
           <View style={styles.infoText}>
-            <Text style={styles.infoLabel}>Rol</Text>
-            <Text style={styles.infoValue}>
+            <Text style={[styles.infoLabel, { color: theme.colors.textSecondary }]}>Rol</Text>
+            <Text style={[styles.infoValue, { color: theme.colors.text }]}>
               {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
             </Text>
           </View>
@@ -152,7 +154,6 @@ export default function Profile({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   loadingContainer: {
     flex: 1,
@@ -160,7 +161,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    backgroundColor: '#fff',
     alignItems: 'center',
     paddingVertical: 30,
     marginBottom: 20,
@@ -171,7 +171,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 5,
   },
   role: {
@@ -180,7 +179,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   infoContainer: {
-    backgroundColor: '#fff',
     marginHorizontal: 20,
     borderRadius: 10,
     padding: 20,
@@ -191,7 +189,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
   },
   infoText: {
     marginLeft: 15,
@@ -199,12 +196,10 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 2,
   },
   infoValue: {
     fontSize: 16,
-    color: '#333',
     fontWeight: '500',
   },
   actionsContainer: {
